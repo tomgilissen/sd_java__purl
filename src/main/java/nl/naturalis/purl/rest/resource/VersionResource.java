@@ -5,8 +5,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
 
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,7 +14,6 @@ import javax.ws.rs.core.UriInfo;
 
 
 @Path("/version")
-/* only here so @EJB injection works in JBoss AS; remove when possible */
 public class VersionResource {
 
 	@GET
@@ -24,7 +21,7 @@ public class VersionResource {
 	@Produces("text/plain;charset=UTF-8")
 	public String show(@Context UriInfo uriInfo)
 	{
-		return "Wowwwww!";
+		return "TODO: version-related data";
 //		try {
 //			Properties props = new Properties();
 //			props.load(getClass().getResourceAsStream("/version.properties"));
