@@ -17,5 +17,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/WildFly 8.x Runtime"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/nl.naturalis.nda.domain"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/nl.naturalis.nda.client"/>
 	<classpathentry kind="output" path="build/main"/>
 </classpath>

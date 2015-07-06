@@ -3,6 +3,10 @@ package nl.naturalis.purl.util;
 import java.io.File;
 import java.io.IOException;
 
+import nl.naturalis.nda.client.ClientConfig;
+import nl.naturalis.nda.client.ClientFactory;
+import nl.naturalis.nda.client.MultiMediaClient;
+import nl.naturalis.nda.client.SpecimenClient;
 import nl.naturalis.purl.ApplicationInitializationException;
 
 import org.domainobject.util.ConfigObject;
@@ -23,8 +27,8 @@ public class AppInfo {
 
 	/**
 	 * System property that tells us where the configuration directory
-	 * (containing at least purl.properties) is. When using
-	 * Wildfly or JBoss, this system property is likely set in standalone.xml.
+	 * (containing at least purl.properties) is. When using Wildfly or JBoss,
+	 * this system property is likely set in standalone.xml.
 	 */
 	public static final String SYSPROP_CONFIG_DIR = "nl.naturalis.purl.conf.dir";
 
@@ -118,6 +122,22 @@ public class AppInfo {
 		catch (IOException e) {
 			throw new ApplicationInitializationException(e);
 		}
+	}
+
+
+	public SpecimenClient getSpecimenClient()
+	{
+		String nbaBaseUrl = config.required("nl.naturalis.purl.baseurl.nba");
+		ClientConfig cfg = new ClientConfig(nbaBaseUrl);
+		return ClientFactory.getInstance(cfg).createSpecimenClient();
+	}
+
+
+	public MultiMediaClient getMultiMediaClient()
+	{
+		String nbaBaseUrl = config.required("nl.naturalis.purl.baseurl.nba");
+		ClientConfig cfg = new ClientConfig(nbaBaseUrl);
+		return ClientFactory.getInstance(cfg).createMultiMediaClient();
 	}
 
 

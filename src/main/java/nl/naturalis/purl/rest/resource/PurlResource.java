@@ -19,10 +19,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
+import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.ObjectType;
+import nl.naturalis.purl.util.AppInfo;
 
 @Path("/")
 public class PurlResource {
@@ -80,13 +83,51 @@ public class PurlResource {
 	@GET
 	@Path("/{institute: (naturalis|floron|voff)}/{objecttype: (specimen|taxon|multimedia)}/{id}")
 	@Produces("text/plain;charset=UTF-8")
-	public Response handle(@PathParam("institute") String institute, @PathParam("objecttype") String objectType, @PathParam("id") String id)
+	public Response handle(@PathParam("institute") String institute, @PathParam("objecttype") String type, @PathParam("id") String id)
 	{
-		ObjectType ot = ObjectType.forName(objectType);
-		MediaType mediaType = negotiate(ot);
-		if (mediaType == null) {
-			return Response.notAcceptable(variants.get(ot)).build();
+		ObjectType objectType = ObjectType.forName(type);
+		try {
+			if (!resourceExists(objectType, id)) {
+				return Response.status(Status.NOT_FOUND).build();
+			}
 		}
+		catch (NBAResourceException e) {
+			return Response.serverError().entity(e.getServerInfoAsString()).build();
+		}
+		MediaType mediaType = negotiate(objectType);
+		if (mediaType == null) {
+			return Response.notAcceptable(variants.get(objectType)).build();
+		}
+		return null;
+	}
+
+
+	private Response redirect(ObjectType objectType, String id, MediaType mediaType)
+	{
+		if (mediaType == JPEG || mediaType == OCTETS) {
+			return redirectToMedialib(id);
+		}
+		else if (mediaType == JSON) {
+			return redirectToNBA(objectType, id);
+		}
+		return redirectToBioportal(objectType, id);
+	}
+
+
+	private Response redirectToMedialib(String id)
+	{
+		return null;
+	}
+
+
+	private Response redirectToNBA(ObjectType objectType, String id)
+	{
+		return null;
+	}
+
+
+	private Response redirectToBioportal(ObjectType objectType, String id)
+	{
 		return null;
 	}
 
@@ -131,6 +172,16 @@ public class PurlResource {
 			}
 		}
 		return types;
+	}
+
+
+	private boolean resourceExists(ObjectType objectType, String id) throws NBAResourceException
+	{
+		if (objectType == SPECIMEN) {
+			return AppInfo.instance().getSpecimenClient().exists(id);
+		}
+		// objectType == MULTIMEDIA
+		return AppInfo.instance().getMultiMediaClient().exists(id);
 	}
 
 }
