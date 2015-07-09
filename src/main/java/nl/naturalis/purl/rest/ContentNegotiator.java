@@ -28,10 +28,10 @@ import nl.naturalis.nda.domain.ObjectType;
 public class ContentNegotiator {
 
 	/*
-	 * Explicitly define all serviceable media type here, without relying on
-	 * predefined types like MediaType.TEXT_HTML_TYPE. Comparison of requested
-	 * and serviceable media types is done solely based on their type (e.g.
-	 * "text") and subtype (e.g. "html"). We don't know exactly how the
+	 * Explicitly define all potentially served media types here, without
+	 * relying on predefined types like MediaType.TEXT_HTML_TYPE. Comparison of
+	 * requested and serviceable media types is done solely based on their type
+	 * (e.g. "text") and subtype (e.g. "html"). We don't know exactly how the
 	 * predefined mediatypes were defined (e.g. possibly also with a charset
 	 * parameter).
 	 */
@@ -49,12 +49,13 @@ public class ContentNegotiator {
 	private static final HashMap<ObjectType, List<Variant>> variants = new HashMap<>(4, 1.0f);
 
 	/*
-	 * Build a map of serviceable media types. Per object type the media types
-	 * that can and will be served are listed. The first media type in the list
-	 * is the default media type (the media type that will we served if there is
-	 * no Accept header in the HTTP request). If the requested media type cannot
-	 * be served, a 406 (NOT ACCEPTABLE) status code is returned, along with a
-	 * list of acceptable alternatives (modeled in JAX-RS by the Variant class).
+	 * Define serviceable media types per object type. Per object type the media
+	 * types that can and will be served are listed. The first media type in the
+	 * list is the default media type (the media type that will we served if
+	 * there is no Accept header in the HTTP request). If the requested media
+	 * type cannot be served, a 406 (NOT ACCEPTABLE) status code is returned,
+	 * along with a list of acceptable alternatives (modeled in JAX-RS by the
+	 * Variant class).
 	 * 
 	 * Note that we currently have no PURLs for taxa.
 	 */
@@ -67,7 +68,7 @@ public class ContentNegotiator {
 		variants.put(SPECIMEN, Arrays.asList(HTML_VAR, JSON_VAR, JPEG_VAR));
 		variants.put(TAXON, Collections.<Variant> emptyList());
 		variants.put(MULTIMEDIA, Arrays.asList(JPEG_VAR, OCTETS_VAR, JSON_VAR));
-
+		
 	}
 
 	private final HttpServletRequest request;
