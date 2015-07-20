@@ -3,15 +3,17 @@ package nl.naturalis.purl.rest;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import nl.naturalis.nda.client.MultiMediaClient;
 import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
-import nl.naturalis.purl.util.AppInfo;
+import nl.naturalis.purl.util.Registry;
 
 /**
  * 
@@ -19,19 +21,20 @@ import nl.naturalis.purl.util.AppInfo;
  * @created Jul 9, 2015
  *
  */
-public class SpecimenPurl extends AbstractPurl {
-
-	public SpecimenPurl(String objectId, MediaType[] mediaTypes)
-	{
-		super(objectId, mediaTypes);
-	}
+public class SpecimenPurlHandler extends AbstractPurlHandler {
 
 	private MultiMediaObject[] multimedia;
 
 
+	public SpecimenPurlHandler(HttpServletRequest request, UriInfo uriInfo)
+	{
+		super(request, uriInfo);
+	}
+
+
 	protected Response doHandle() throws Exception
 	{
-		if (!AppInfo.instance().getSpecimenClient().exists(localId)) {
+		if (!Registry.getInstance().getSpecimenClient().exists(objectID)) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		ContentNegotiator negotiator = ContentNegotiatorFactory.getInstance().forSpecimens(accept);
@@ -84,8 +87,8 @@ public class SpecimenPurl extends AbstractPurl {
 	private MultiMediaObject[] getMultiMedia() throws NBAResourceException
 	{
 		if (multimedia == null) {
-			MultiMediaClient client = AppInfo.instance().getMultiMediaClient();
-			multimedia = client.getMultiMediaForSpecimen(localId);
+			MultiMediaClient client = Registry.getInstance().getMultiMediaClient();
+			multimedia = client.getMultiMediaForSpecimen(objectID);
 		}
 		return multimedia;
 	}
@@ -93,23 +96,23 @@ public class SpecimenPurl extends AbstractPurl {
 
 	private URI getBioportalUrl()
 	{
-		String baseUrl = AppInfo.instance().getConfig().required("bioportal.baseurl");
+		String baseUrl = Registry.getInstance().getConfig().required("bioportal.baseurl");
 		StringBuilder url = new StringBuilder(128);
 		url.append(baseUrl);
 		url.append("/nba/result?nba_request=");
 		url.append(urlEncode("specimen/get-specimen/?unitID="));
-		url.append(urlEncode(localId));
+		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 
 
 	private URI getNbaUrl()
 	{
-		String baseUrl = AppInfo.instance().getConfig().required("nba.baseurl");
+		String baseUrl = Registry.getInstance().getConfig().required("nba.baseurl");
 		StringBuilder url = new StringBuilder(128);
 		url.append(baseUrl);
 		url.append("/specimen/find/");
-		url.append(urlEncode(localId));
+		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 

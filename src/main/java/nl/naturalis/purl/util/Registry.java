@@ -15,15 +15,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A singleton responsible for initializing logging and loading the
- * configuration for the PURL REST service.
+ * A singleton responsible for configuring and handing out various types of
+ * objects to interested classes.
  * 
  * @author Ayco Holleman
  *
  */
-public class AppInfo {
+public class Registry {
 
-	private static final Logger logger = LoggerFactory.getLogger(AppInfo.class);
+	private static final Logger logger = LoggerFactory.getLogger(Registry.class);
 
 	/**
 	 * System property that tells us where the configuration directory
@@ -37,15 +37,15 @@ public class AppInfo {
 	 */
 	private static final String CONFIG_FILE_NAME = "purl.properties";
 
-	private static AppInfo instance;
+	private static Registry instance;
 
 	private final File confDir;
 	private final ConfigObject config;
 
 
 	/**
-	 * Do curcuial initialization work required before handling any service
-	 * request. If anything goes wrong during the initializion process an
+	 * Do initialization work required before handling any service request. If
+	 * anything goes wrong during the initializion process an
 	 * {@link ApplicationInitializationException} is thrown, causing the entire
 	 * web application to die already during startup. An explanation of what
 	 * went wrong is written to the Wildfly log (standalone/log/server.log).
@@ -53,7 +53,7 @@ public class AppInfo {
 	public static void initialize()
 	{
 		if (instance == null) {
-			instance = new AppInfo();
+			instance = new Registry();
 		}
 	}
 
@@ -64,15 +64,22 @@ public class AppInfo {
 	 * 
 	 * @return
 	 */
-	public static AppInfo instance()
+	public static Registry getInstance()
 	{
 		initialize();
 		return instance;
 	}
 
 
+	private Registry()
+	{
+		confDir = confDir();
+		config = loadConfig();
+	}
+
+
 	/**
-	 * Return a {@code ConfigObject} with the properties from purl.properties.
+	 * Return a {@code ConfigObject} for purl.properties.
 	 * 
 	 * @return
 	 */
@@ -85,43 +92,14 @@ public class AppInfo {
 	/**
 	 * Get the directory designated to contain the application's configuration
 	 * files. This directory will contain at least purl.properties and
-	 * logback.xml, but may also contain more user-oriented configuration files.
+	 * logback.xml, but may also contain other, more user-oriented configuration
+	 * files.
 	 * 
 	 * @return
 	 */
 	public File getConfDir()
 	{
 		return confDir;
-	}
-
-
-	private AppInfo()
-	{
-		confDir = confDir();
-		config = loadConfig();
-	}
-
-
-	private static File confDir()
-	{
-		String path = System.getProperty(SYSPROP_CONFIG_DIR);
-		if (path == null) {
-			String msg = String.format("Missing system property \"%s\"", SYSPROP_CONFIG_DIR);
-			throw new ApplicationInitializationException(msg);
-		}
-		File dir = new File(path);
-		if (!dir.isDirectory()) {
-			String msg = String.format("Invalid value for system property \"%s\": \"%s\" (no such directory)", SYSPROP_CONFIG_DIR, path);
-			throw new ApplicationInitializationException(msg);
-		}
-		try {
-			dir = dir.getCanonicalFile();
-			logger.info("Configuration directory for this application: " + dir.getAbsolutePath());
-			return dir;
-		}
-		catch (IOException e) {
-			throw new ApplicationInitializationException(e);
-		}
 	}
 
 
@@ -150,6 +128,29 @@ public class AppInfo {
 		}
 		logger.info("Loading application configuration from " + file.getAbsolutePath());
 		return new ConfigObject(file);
+	}
+
+
+	private static File confDir()
+	{
+		String path = System.getProperty(SYSPROP_CONFIG_DIR);
+		if (path == null) {
+			String msg = String.format("Missing system property \"%s\"", SYSPROP_CONFIG_DIR);
+			throw new ApplicationInitializationException(msg);
+		}
+		File dir = new File(path);
+		if (!dir.isDirectory()) {
+			String msg = String.format("Invalid value for system property \"%s\": \"%s\" (no such directory)", SYSPROP_CONFIG_DIR, path);
+			throw new ApplicationInitializationException(msg);
+		}
+		try {
+			dir = dir.getCanonicalFile();
+			logger.info("Configuration directory for this application: " + dir.getAbsolutePath());
+			return dir;
+		}
+		catch (IOException e) {
+			throw new ApplicationInitializationException(e);
+		}
 	}
 
 }

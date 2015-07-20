@@ -15,8 +15,8 @@ import nl.naturalis.nda.domain.ServiceAccessPoint;
 
 /**
  * A {@code ContentNegotiator} establishes the type of content to be served by
- * comparing the Accept headers in the request with the available content types
- * for a given object (specimen, multimedia, etc.).
+ * comparing the Accept headers in the HTTP request with the available content
+ * types for the requested object type.
  * 
  * @author Ayco Holleman
  *
@@ -24,8 +24,8 @@ import nl.naturalis.nda.domain.ServiceAccessPoint;
 public class ContentNegotiator {
 
 	/**
-	 * Retrieve Accept headers from the HTTP request and convert them to
-	 * {@code MediaType} instances.
+	 * Retrieve Accept headers from the HTTP request and convert them to an
+	 * array of {@code MediaType} instances.
 	 * 
 	 * @param request
 	 * @return
@@ -51,8 +51,8 @@ public class ContentNegotiator {
 
 
 	/*
-	 * Package visibility. {@code ContentNegotiator}s can only be created by a
-	 * {@code ContentNegotiatorFactory}.
+	 * Package visibility. You must use a ContentNegotiatorFactory to get hold
+	 * of a ContentNegotiator.
 	 */
 	ContentNegotiator()
 	{
@@ -79,9 +79,10 @@ public class ContentNegotiator {
 
 
 	/**
-	 * Establish the preferred media type to be served, based on the requested
-	 * media types in the Accept header, and the serviceable media types for the
-	 * mediaTypes object type (specimen, multimedia, ...)
+	 * Establish the media type to be served. This version of {@code negotiate}
+	 * assumes that the client has not passed any Accept headers denoting a
+	 * media type that is served by the medialib (or some other multimedia
+	 * repository).
 	 * 
 	 * @return
 	 */
@@ -102,6 +103,18 @@ public class ContentNegotiator {
 	}
 
 
+	/**
+	 * Establish the media type to be served. This version of {@code negotiate}
+	 * assumes that the client passed at least one Accept header denoting a
+	 * media type that is served by the medialib (or some other multimedia
+	 * repository). In that case we must first check which media types exist for
+	 * the object specified by the PURL.
+	 * 
+	 * @param multimedia
+	 *            The available multimedia for the object for which we are
+	 *            trying to establish the preferred representation
+	 * @return
+	 */
 	public MediaType negotiate(MultiMediaObject[] multimedia)
 	{
 		if (requestedMediaTypes.length == 0) {
@@ -144,6 +157,15 @@ public class ContentNegotiator {
 	}
 
 
+	/**
+	 * Provide alternative media types if the client has requested a media type
+	 * that we cannot serve.
+	 * 
+	 * @param multimedia
+	 *            The available multimedia for the object requested by the
+	 *            client
+	 * @return
+	 */
 	public List<Variant> getAlternatives(MultiMediaObject[] multimedia)
 	{
 		List<Variant> alternatives = new ArrayList<>();

@@ -3,7 +3,7 @@ package nl.naturalis.purl.rest;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import nl.naturalis.purl.util.AppInfo;
+import nl.naturalis.purl.util.Registry;
 
 /**
  * @author Ayco Holleman
@@ -15,6 +15,6 @@ public class JAXRS extends Application {
 	public JAXRS()
 	{
 		super();
-		AppInfo.initialize();
+		Registry.initialize();
 	}
 }

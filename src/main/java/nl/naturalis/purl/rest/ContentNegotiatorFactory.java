@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import nl.naturalis.purl.util.AppInfo;
+import nl.naturalis.purl.util.Registry;
 
 import org.domainobject.util.ConfigObject;
 
@@ -41,7 +41,7 @@ public class ContentNegotiatorFactory {
 
 
 	/**
-	 * Get a content negotiator for specimen PURLs
+	 * Get a content negotiator for specimen PURLs.
 	 * 
 	 * @return
 	 */
@@ -56,11 +56,11 @@ public class ContentNegotiatorFactory {
 
 
 	/**
-	 * Get a content negotiator for multimedia PURLs
+	 * Get a content negotiator for multimedia PURLs.
 	 * 
 	 * @return
 	 */
-	public ContentNegotiator getMultimediaContentNegotiator(MediaType[] accept)
+	public ContentNegotiator forMultimedia(MediaType[] accept)
 	{
 		ContentNegotiator negotiator = new ContentNegotiator();
 		negotiator.setGeneratedMediaTypes(generatedMultiMediaMediaTypes);
@@ -78,7 +78,7 @@ public class ContentNegotiatorFactory {
 	private static MediaType[] getGeneratedMediaTypes(String prefix)
 	{
 		List<MediaType> types = new ArrayList<>();
-		ConfigObject config = AppInfo.instance().getConfig();
+		ConfigObject config = Registry.getInstance().getConfig();
 		types.add(MediaType.valueOf(config.required(prefix + ".purl.accept.default")));
 		for (int i = 0;; ++i) {
 			String key = prefix + ".purl.accept." + i;
@@ -100,7 +100,7 @@ public class ContentNegotiatorFactory {
 	private static MediaType[] getRepositoryMediaTypes()
 	{
 		List<MediaType> types = new ArrayList<>();
-		ConfigObject config = AppInfo.instance().getConfig();
+		ConfigObject config = Registry.getInstance().getConfig();
 		for (int i = 0;; ++i) {
 			String key = "medialib.mediatypes." + i;
 			String val = config.get(key);

@@ -3,8 +3,10 @@ package nl.naturalis.purl.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import nl.naturalis.nda.client.NBAResourceException;
 
@@ -14,7 +16,16 @@ import nl.naturalis.nda.client.NBAResourceException;
  * @created Jul 9, 2015
  *
  */
-public abstract class AbstractPurl implements Purl {
+public abstract class AbstractPurlHandler implements PurlHandler {
+
+	/**
+	 * When sending a JSON response, use this media type in stead of the prefab
+	 * MediaType.APPLICATION_JSON. We seem to have reports that without the
+	 * charset parameter, some browsers or browser versions don't interpret the
+	 * response as expected.
+	 */
+	protected static final String JSON_MEDIA_TYPE = "application/json;charset=UTF-8";
+
 
 	protected static String urlEncode(String s)
 	{
@@ -46,33 +57,25 @@ public abstract class AbstractPurl implements Purl {
 		return trace;
 	}
 
-	protected final String localId;
+	protected final String objectID;
 	protected final MediaType[] accept;
+	protected final boolean debug;
 
-	private boolean debug;
 
-
-	/**
-	 * Create a PURL handler for the specified local scope id and the specified
-	 * media types in the Accept header. The local scope id is part of the PURL
-	 * (usually the last or second-last part of the URL). It is a
-	 * Naturalis-specific ID for the object, for example a bar code.
-	 */
-	public AbstractPurl(String localId, MediaType[] accept)
+	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
-		this.localId = localId;
-		this.accept = accept;
-	}
-
-
-	public void setDebug(boolean debug)
-	{
-		this.debug = debug;
+		this.objectID = uriInfo.getPathParameters().getFirst("UnitID");
+		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
+		String val = uriInfo.getQueryParameters().getFirst("__debug");
+		if (val == null || val.length() == 0 || val.toLowerCase().equals("true"))
+			this.debug = true;
+		else
+			this.debug = false;
 	}
 
 
 	@Override
-	public final Response handle()
+	public final Response handlePurl()
 	{
 		try {
 			Response response = doHandle();
