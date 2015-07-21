@@ -1,7 +1,6 @@
 package nl.naturalis.purl.rest;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,26 +38,6 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		}
 	}
 
-
-	protected static String[] getStackTrace(Throwable t)
-	{
-		while (t.getCause() != null) {
-			t = t.getCause();
-		}
-		StackTraceElement[] stackTrace = t.getStackTrace();
-		String[] trace = new String[stackTrace.length];
-		for (int i = 0; i < stackTrace.length; ++i) {
-			StackTraceElement e = stackTrace[i];
-			StringBuilder sb = new StringBuilder(128);
-			sb.append("at ");
-			sb.append(e.getClassName()).append('.').append(e.getMethodName());
-			sb.append('(').append(e.getFileName()).append(':').append(e.getLineNumber()).append(')');
-			trace[i] = sb.toString();
-		}
-		return trace;
-	}
-
-
 	protected final String objectID;
 	protected final MediaType[] accept;
 	protected final boolean debug;
@@ -69,7 +48,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		this.objectID = uriInfo.getPathParameters().getFirst("UnitID");
 		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
 		String val = uriInfo.getQueryParameters().getFirst("__debug");
-		if (val == null || val.length() == 0 || val.toLowerCase().equals("true"))
+		if (val != null && (val.length() == 0 || val.toLowerCase().equals("true")))
 			this.debug = true;
 		else
 			this.debug = false;
@@ -86,19 +65,49 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		}
 		catch (NBAResourceException e) {
 			if (debug)
-				return Response.ok().entity(e.getServerInfoAsString()).build();
+				return debugResponse(e.getServerInfoAsString());
 			else
-				return Response.serverError().entity(e.getServerInfoAsString()).build();
+				return serverError(e.getServerInfoAsString());
 		}
 		catch (Throwable t) {
 			if (debug)
-				return Response.ok().entity(getStackTrace(t)).build();
+				return debugResponse(getStackTrace(t));
 			else
-				return Response.serverError().entity(getStackTrace(t)).build();
+				return serverError(getStackTrace(t));
 		}
 	}
 
 
 	protected abstract Response doHandle() throws Exception;
+
+
+	private static Response serverError(String entity)
+	{
+		return Response.serverError().type(MediaType.TEXT_PLAIN).entity(entity).build();
+	}
+
+
+	private static Response debugResponse(String entity)
+	{
+		return Response.ok().type(MediaType.TEXT_PLAIN).entity(entity).build();
+	}
+
+
+	private static String getStackTrace(Throwable t)
+	{
+		while (t.getCause() != null) {
+			t = t.getCause();
+		}
+		StackTraceElement[] stackTrace = t.getStackTrace();
+		StringBuilder sb = new StringBuilder(6000);
+		sb.append(t.toString());
+		for (int i = 0; i < stackTrace.length; ++i) {
+			StackTraceElement e = stackTrace[i];
+			sb.append("\nat ");
+			sb.append(e.getClassName()).append('.').append(e.getMethodName());
+			sb.append('(').append(e.getFileName()).append(':').append(e.getLineNumber()).append(')');
+		}
+		return sb.toString();
+	}
 
 }
