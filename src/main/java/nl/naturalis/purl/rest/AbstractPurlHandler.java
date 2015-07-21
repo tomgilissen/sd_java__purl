@@ -1,6 +1,7 @@
 package nl.naturalis.purl.rest;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +56,12 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 			trace[i] = sb.toString();
 		}
 		return trace;
+	}
+
+
+	protected static Response redirect(MediaType mediaType, URI location)
+	{
+		return Response.temporaryRedirect(location).type(mediaType).build();
 	}
 
 	protected final String objectID;

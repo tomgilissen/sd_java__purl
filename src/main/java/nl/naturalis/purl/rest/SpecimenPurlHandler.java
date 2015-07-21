@@ -6,13 +6,14 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import nl.naturalis.nda.client.MultiMediaClient;
 import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
+import nl.naturalis.purl.PURLException;
 import nl.naturalis.purl.util.Registry;
 
 /**
@@ -48,53 +49,24 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		if (mediaType == null) {
 			return Response.notAcceptable(negotiator.getAlternatives(getMultiMedia())).build();
 		}
-		if (mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
-			return Response.temporaryRedirect(getBioportalUrl()).build();
-		}
-		else if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
-			return Response.temporaryRedirect(getNbaUrl()).build();
-		}
-		else {
-			Response response = redirectToMedialib(mediaType);
-			assert (response != null);
-			return response;
-		}
+		return redirect(mediaType, getLocation(mediaType));
 	}
 
 
-	private Response redirectToMedialib(MediaType mediaType) throws NBAResourceException
+	private URI getLocation(MediaType mediaType) throws NBAResourceException, PURLException
 	{
-		MultiMediaObject[] multimedia = getMultiMedia();
-		if (multimedia != null) {
-			Set<ServiceAccessPoint.Variant> variants;
-			for (MultiMediaObject mmo : multimedia) {
-				if (mmo.getServiceAccessPoints() != null) {
-					variants = mmo.getServiceAccessPoints().keySet();
-					for (ServiceAccessPoint.Variant variant : variants) {
-						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
-						MediaType sapMediaType = MediaType.valueOf(sap.getFormat());
-						if (sapMediaType.equals(mediaType)) {
-							return Response.temporaryRedirect(sap.getAccessUri()).build();
-						}
-					}
-				}
-			}
+		if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
+			return getBioportalUri();
 		}
-		return null;
+		if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
+			return getNbaUri();
+		}
+		return getMedialibUri(mediaType);
 	}
 
 
-	private MultiMediaObject[] getMultiMedia() throws NBAResourceException
-	{
-		if (multimedia == null) {
-			MultiMediaClient client = Registry.getInstance().getMultiMediaClient();
-			multimedia = client.getMultiMediaForSpecimen(objectID);
-		}
-		return multimedia;
-	}
 
-
-	private URI getBioportalUrl()
+	private URI getBioportalUri()
 	{
 		String baseUrl = Registry.getInstance().getConfig().required("bioportal.baseurl");
 		StringBuilder url = new StringBuilder(128);
@@ -106,7 +78,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	}
 
 
-	private URI getNbaUrl()
+	private URI getNbaUri()
 	{
 		String baseUrl = Registry.getInstance().getConfig().required("nba.baseurl");
 		StringBuilder url = new StringBuilder(128);
@@ -115,5 +87,44 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
 	}
+
+
+	private URI getMedialibUri(MediaType mediaType) throws NBAResourceException
+	{
+		MultiMediaObject[] multimedia = getMultiMedia();
+		if (multimedia != null) {
+			Set<ServiceAccessPoint.Variant> variants;
+			for (MultiMediaObject mmo : multimedia) {
+				if (mmo.getServiceAccessPoints() != null) {
+					variants = mmo.getServiceAccessPoints().keySet();
+					for (ServiceAccessPoint.Variant variant : variants) {
+						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
+						MediaType sapMediaType = MediaType.valueOf(sap.getFormat());
+						if (sapMediaType.equals(mediaType)) {
+							return sap.getAccessUri();
+						}
+					}
+				}
+			}
+		}
+		/*
+		 * Because the content negotiator has iterated through the exact same
+		 * multimedia objects to see which media types are available for the
+		 * requested object, and if one of them matches what the client wants,
+		 * we should never get here.
+		 */
+		assert (false);
+		return null;
+	}
+
+	private MultiMediaObject[] getMultiMedia() throws NBAResourceException
+	{
+		if (multimedia == null) {
+			MultiMediaClient client = Registry.getInstance().getMultiMediaClient();
+			multimedia = client.getMultiMediaForSpecimen(objectID);
+		}
+		return multimedia;
+	}
+
 
 }
