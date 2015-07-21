@@ -11,6 +11,12 @@ import javax.ws.rs.core.UriInfo;
 import nl.naturalis.nda.client.NBAResourceException;
 
 /**
+ * Abstract base class for classes capable of handling PURL requests. Implements
+ * the one method specified by the {@link PurlHandler} interface by delegating
+ * everything to concrete subclasses via an abstract template method (
+ * {@link #doHandle()}). What it does take care of, however, is exception
+ * handling. Subclasses should generally not try to handle {@code Exception}s
+ * themselves, but just throw them out of the {@code doHandle()} method.
  * 
  * @author Ayco Holleman
  * @created Jul 9, 2015
@@ -24,7 +30,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	 * charset parameter, some browsers or browser versions don't interpret the
 	 * response as expected.
 	 */
-	protected static final String JSON_MEDIA_TYPE = "application/json;charset=UTF-8";
+	protected static final String MEDIA_TYPE_JSON = "application/json;charset=UTF-8";
 
 
 	protected static String urlEncode(String s)
@@ -98,11 +104,9 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		while (t.getCause() != null) {
 			t = t.getCause();
 		}
-		StackTraceElement[] stackTrace = t.getStackTrace();
 		StringBuilder sb = new StringBuilder(6000);
 		sb.append(t.toString());
-		for (int i = 0; i < stackTrace.length; ++i) {
-			StackTraceElement e = stackTrace[i];
+		for (StackTraceElement e : t.getStackTrace()) {
 			sb.append("\nat ");
 			sb.append(e.getClassName()).append('.').append(e.getMethodName());
 			sb.append('(').append(e.getFileName()).append(':').append(e.getLineNumber()).append(')');

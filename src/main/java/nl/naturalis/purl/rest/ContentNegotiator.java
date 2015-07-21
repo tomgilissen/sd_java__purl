@@ -32,6 +32,10 @@ public class ContentNegotiator {
 	 */
 	public static MediaType[] getRequestedMediaTypes(HttpServletRequest request)
 	{
+		String param = request.getParameter("__accept");
+		if (param != null) {
+			return getRequestedMediaTypesDebug(param);
+		}
 		List<MediaType> types = new ArrayList<>();
 		Enumeration<String> acceptHeaders = request.getHeaders("Accept");
 		while (acceptHeaders.hasMoreElements()) {
@@ -193,6 +197,22 @@ public class ContentNegotiator {
 			}
 		}
 		return mediaTypes;
+	}
+
+
+	private static MediaType[] getRequestedMediaTypesDebug(String requestParam)
+	{
+		String[] chunks = requestParam.split(";");
+		List<MediaType> types = new ArrayList<>(chunks.length);
+		for (String chunk : chunks) {
+			try {
+				types.add(MediaType.valueOf(chunk));
+			}
+			catch (IllegalArgumentException e) {
+				// Ignore accept headers that JAX-RS cannot parse
+			}
+		}
+		return types.toArray(new MediaType[types.size()]);
 	}
 
 }
