@@ -44,7 +44,7 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 			MultiMediaObject[] multimedia = new MultiMediaObject[] { nbaResult };
 			return Response.notAcceptable(negotiator.getAlternatives(multimedia)).build();
 		}
-		return redirect(mediaType, getLocation(mediaType));
+		return Response.temporaryRedirect(getLocation(mediaType)).build();
 	}
 
 

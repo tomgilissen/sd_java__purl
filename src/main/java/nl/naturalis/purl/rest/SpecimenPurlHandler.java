@@ -49,7 +49,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		if (mediaType == null) {
 			return Response.notAcceptable(negotiator.getAlternatives(getMultiMedia())).build();
 		}
-		return redirect(mediaType, getLocation(mediaType));
+		return Response.temporaryRedirect(getLocation(mediaType)).build();
 	}
 
 

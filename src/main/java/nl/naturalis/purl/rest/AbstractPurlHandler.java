@@ -59,11 +59,6 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	}
 
 
-	protected static Response redirect(MediaType mediaType, URI location)
-	{
-		return Response.temporaryRedirect(location).type(mediaType).build();
-	}
-
 	protected final String objectID;
 	protected final MediaType[] accept;
 	protected final boolean debug;
