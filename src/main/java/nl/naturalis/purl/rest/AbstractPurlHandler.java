@@ -14,12 +14,13 @@ import nl.naturalis.nda.client.NBAResourceException;
  * Abstract base class for classes capable of handling PURL requests. Implements
  * the one method specified by the {@link PurlHandler} interface by delegating
  * everything to concrete subclasses via an abstract template method (
- * {@link #doHandle()}). What it does take care of, however, is exception
- * handling. Subclasses should generally not try to handle {@code Exception}s
- * themselves, but just throw them out of the {@code doHandle()} method.
+ * {@link #doHandle()}). What it does take care of, however, is error handling.
+ * Subclasses should generally not try to handle {@code Exception}s themselves,
+ * but just throw them out of the {@code doHandle()} method.
  * 
  * @author Ayco Holleman
  * @created Jul 9, 2015
+ * 
  *
  */
 public abstract class AbstractPurlHandler implements PurlHandler {
@@ -51,11 +52,17 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	protected final boolean debug;
 
 
+	/**
+	 * Create a {@code PurlHandler} for the specified PURL request.
+	 * 
+	 * @param request
+	 * @param uriInfo
+	 */
 	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
 		this.request = request;
 		this.uriInfo = uriInfo;
-		this.objectID = uriInfo.getPathParameters().getFirst("UnitID");
+		this.objectID = uriInfo.getPathParameters().getFirst("objectID");
 		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
 		String val = uriInfo.getQueryParameters().getFirst("__debug");
 		if (val != null && (val.length() == 0 || val.toLowerCase().equals("true")))
@@ -65,6 +72,9 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	}
 
 
+	/**
+	 * Implements {@link PurlHandler#handlePurl()}.
+	 */
 	@Override
 	public final Response handlePurl()
 	{
@@ -88,6 +98,14 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	}
 
 
+	/**
+	 * Template method to be implemented by concrete subclasses. Subclasses are
+	 * allowed and encouraged to throw any exception that should lead to a
+	 * server error directly out of the {@code doHandle} method.
+	 * 
+	 * @return The HTTP response to be sent back to the client.
+	 * @throws Exception
+	 */
 	protected abstract Response doHandle() throws Exception;
 
 

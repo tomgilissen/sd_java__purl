@@ -12,8 +12,15 @@ import javax.ws.rs.core.UriInfo;
 import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
-import nl.naturalis.purl.util.Registry;
+import nl.naturalis.purl.Registry;
 
+/**
+ * A {@link PurlHandler} capable of handling PURLs for multimedia objects.
+ * 
+ * @author Ayco Holleman
+ * @created Jul 22, 2015
+ *
+ */
 public class MultimediaPurlHandler extends AbstractPurlHandler {
 
 	private MultiMediaObject nbaResult;
@@ -62,9 +69,8 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 
 	private URI getBioportalUri()
 	{
-		String baseUrl = Registry.getInstance().getConfig().required("bioportal.baseurl");
 		StringBuilder url = new StringBuilder(128);
-		url.append(baseUrl);
+		url.append(Registry.getInstance().getBioportalBaseUrl());
 		url.append("/nba/result?nba_request=");
 		url.append(urlEncode("multimedia/get-multimedia/?unitID="));
 		url.append(urlEncode(objectID));
@@ -74,9 +80,8 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 
 	private URI getNbaUri()
 	{
-		String baseUrl = Registry.getInstance().getConfig().required("nba.baseurl");
 		StringBuilder url = new StringBuilder(128);
-		url.append(baseUrl);
+		url.append(Registry.getInstance().getNbaBaseUrl());
 		url.append("/multimedia/find/");
 		url.append(urlEncode(objectID));
 		return URI.create(url.toString());

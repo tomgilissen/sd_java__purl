@@ -11,6 +11,14 @@ import nl.naturalis.purl.rest.MultimediaPurlHandler;
 import nl.naturalis.purl.rest.PurlHandler;
 import nl.naturalis.purl.rest.SpecimenPurlHandler;
 
+/**
+ * Central class of the PURL service. Provides endpoints for PURLs, but
+ * delegates all the heavy lifting to specialized {@link PurlHandler}s.
+ * 
+ * @author Ayco Holleman
+ * @created Jul 22, 2015
+ *
+ */
 @Path("/")
 public class PurlResource {
 
@@ -21,16 +29,27 @@ public class PurlResource {
 	private UriInfo uriInfo;
 
 
+	/**
+	 * Endpoint for specimen PURLs.
+	 * 
+	 * @return
+	 */
 	@GET
-	@Path("/naturalis/specimen/{UnitID}")
+	@Path("/naturalis/specimen/{objectID}")
 	public Response handleNaturalisSpecimenPurl()
 	{
 		PurlHandler handler = new SpecimenPurlHandler(request, uriInfo);
 		return handler.handlePurl();
 	}
 
+
+	/**
+	 * Endpoint for multimedia PURLs.
+	 * 
+	 * @return
+	 */
 	@GET
-	@Path("/naturalis/multimedia/{UnitID}")
+	@Path("/naturalis/multimedia/{objectID}")
 	public Response handleNaturalisMultimediaPurl()
 	{
 		PurlHandler handler = new MultimediaPurlHandler(request, uriInfo);

@@ -13,10 +13,11 @@ import nl.naturalis.nda.client.MultiMediaClient;
 import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
-import nl.naturalis.purl.PURLException;
-import nl.naturalis.purl.util.Registry;
+import nl.naturalis.purl.PurlException;
+import nl.naturalis.purl.Registry;
 
 /**
+ * A {@link PurlHandler} capable of handling PURLs for specimen objects.
  * 
  * @author Ayco Holleman
  * @created Jul 9, 2015
@@ -53,7 +54,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	}
 
 
-	private URI getLocation(MediaType mediaType) throws NBAResourceException, PURLException
+	private URI getLocation(MediaType mediaType) throws NBAResourceException, PurlException
 	{
 		if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
 			return getBioportalUri();
@@ -65,12 +66,10 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	}
 
 
-
 	private URI getBioportalUri()
 	{
-		String baseUrl = Registry.getInstance().getConfig().required("bioportal.baseurl");
 		StringBuilder url = new StringBuilder(128);
-		url.append(baseUrl);
+		url.append(Registry.getInstance().getBioportalBaseUrl());
 		url.append("/nba/result?nba_request=");
 		url.append(urlEncode("specimen/get-specimen/?unitID="));
 		url.append(urlEncode(objectID));
@@ -80,9 +79,8 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 
 	private URI getNbaUri()
 	{
-		String baseUrl = Registry.getInstance().getConfig().required("nba.baseurl");
 		StringBuilder url = new StringBuilder(128);
-		url.append(baseUrl);
+		url.append(Registry.getInstance().getNbaBaseUrl());
 		url.append("/specimen/find/");
 		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
@@ -117,6 +115,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		return null;
 	}
 
+
 	private MultiMediaObject[] getMultiMedia() throws NBAResourceException
 	{
 		if (multimedia == null) {
@@ -125,6 +124,5 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		}
 		return multimedia;
 	}
-
 
 }

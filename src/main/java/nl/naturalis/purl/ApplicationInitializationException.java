@@ -1,6 +1,11 @@
 package nl.naturalis.purl;
 
 /**
+ * Exception thrown if anything goes wrong while configuring and initializing the PURL
+ * application.
+ * 
+ * @see Registry
+ * 
  * @author Ayco Holleman
  *
  */

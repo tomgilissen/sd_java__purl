@@ -16,7 +16,7 @@ import nl.naturalis.nda.domain.ServiceAccessPoint;
 /**
  * A {@code ContentNegotiator} establishes the type of content to be served by
  * comparing the Accept headers in the HTTP request with the available content
- * types for the requested object type.
+ * types.
  * 
  * @author Ayco Holleman
  *

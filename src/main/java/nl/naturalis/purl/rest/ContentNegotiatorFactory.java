@@ -5,15 +5,14 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import nl.naturalis.purl.util.Registry;
+import nl.naturalis.purl.Registry;
 
 import org.domainobject.util.ConfigObject;
 
 /**
- * A {@code ContentNegotiatorFactory} handles the creation of
- * {@link ContentNegotiator}s. For each type of object we have PURLs for
- * (specimens, multimedia , etc.) you can request a tailor-made
- * {@code ContentNegotiator}.
+ * A {@code ContentNegotiatorFactory} handles the configuration and creation of
+ * {@link ContentNegotiator}s. For each type of object (specimens, multimedia ,
+ * etc.) you can request a tailor-made {@code ContentNegotiator}.
  * 
  * @author Ayco Holleman
  * @created Jul 16, 2015
@@ -24,6 +23,11 @@ public class ContentNegotiatorFactory {
 	private static ContentNegotiatorFactory instance;
 
 
+	/**
+	 * Return a {@code ContentNegotiatorFactory} instance.
+	 * 
+	 * @return
+	 */
 	public static ContentNegotiatorFactory getInstance()
 	{
 		if (instance == null) {

@@ -1,8 +1,5 @@
 package nl.naturalis.purl.rest.resource;
 
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Properties;
 
 import javax.ws.rs.GET;
@@ -12,37 +9,39 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-
+/**
+ * REST resource providing version-related information about the PURL service.
+ * 
+ * @author Ayco Holleman
+ * @created Jul 22, 2015
+ *
+ */
 @Path("/version")
 public class VersionResource {
 
+	/**
+	 * Show version-related information in plain text format.
+	 * 
+	 * @param uriInfo
+	 * @return
+	 */
 	@GET
 	@Path("/")
 	@Produces("text/plain;charset=UTF-8")
 	public String show(@Context UriInfo uriInfo)
 	{
+		// Suppress "method can be declared static" warning
+		getClass();
 		return "TODO: version-related data";
-//		try {
-//			Properties props = new Properties();
-//			props.load(getClass().getResourceAsStream("/version.properties"));
-//			StringWriter sw = new StringWriter(128);
-//			PrintWriter pw = new PrintWriter(sw);
-//			pw.println("Netherlands Biodiversity API (NBA)");
-//			pw.println();
-//			String version = props.getProperty("git.tag");
-//			pw.println("Version: " + version);
-//			pw.println("Build date: " + props.getProperty("built"));
-//			pw.println("Git branch: " + props.getProperty("git.branch"));
-//			pw.println("Git commit: " + props.getProperty("git.commit"));
-//			return sw.toString();
-//		}
-//		catch (Throwable t) {
-//			//throw ResourceUtil.handleError(uriInfo, t);
-//			return null;
-//		}
 	}
 
 
+	/**
+	 * Show version-related information in json format.
+	 * 
+	 * @param uriInfo
+	 * @return
+	 */
 	@GET
 	@Path("/json")
 	@Produces(MediaType.APPLICATION_JSON)
