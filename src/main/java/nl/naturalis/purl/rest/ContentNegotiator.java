@@ -25,7 +25,9 @@ public class ContentNegotiator {
 
 	/**
 	 * Retrieve Accept headers from the HTTP request and convert them to an
-	 * array of {@code MediaType} instances.
+	 * array of {@code MediaType} instances. You can mimic Accept headers (for
+	 * debugging purposes) by adding an "__accept" query to the PURL. If you do
+	 * this, the actual Accept headers (if any) will be ignored.
 	 * 
 	 * @param request
 	 * @return

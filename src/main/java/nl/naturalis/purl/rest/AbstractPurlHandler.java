@@ -44,6 +44,8 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		}
 	}
 
+	protected final HttpServletRequest request;
+	protected final UriInfo uriInfo;
 	protected final String objectID;
 	protected final MediaType[] accept;
 	protected final boolean debug;
@@ -51,6 +53,8 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 
 	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
+		this.request = request;
+		this.uriInfo = uriInfo;
 		this.objectID = uriInfo.getPathParameters().getFirst("UnitID");
 		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
 		String val = uriInfo.getQueryParameters().getFirst("__debug");

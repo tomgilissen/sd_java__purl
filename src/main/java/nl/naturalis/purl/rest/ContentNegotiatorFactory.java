@@ -10,6 +10,11 @@ import nl.naturalis.purl.util.Registry;
 import org.domainobject.util.ConfigObject;
 
 /**
+ * A {@code ContentNegotiatorFactory} handles the creation of
+ * {@link ContentNegotiator}s. For each type of object we have PURLs for
+ * (specimens, multimedia , etc.) you can request a tailor-made
+ * {@code ContentNegotiator}.
+ * 
  * @author Ayco Holleman
  * @created Jul 16, 2015
  *
