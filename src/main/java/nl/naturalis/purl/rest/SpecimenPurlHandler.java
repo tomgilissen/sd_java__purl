@@ -1,17 +1,20 @@
 package nl.naturalis.purl.rest;
 
+import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
+import static nl.naturalis.purl.rest.ResourceUtil.notFound;
+
 import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import nl.naturalis.nda.client.MultiMediaClient;
 import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.MultiMediaObject;
+import nl.naturalis.nda.domain.ObjectType;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
 import nl.naturalis.purl.PurlException;
 import nl.naturalis.purl.Registry;
@@ -34,10 +37,14 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	}
 
 
+	/**
+	 * @see AbstractPurlHandler#doHandle()
+	 */
+	@Override
 	protected Response doHandle() throws Exception
 	{
 		if (!Registry.getInstance().getSpecimenClient().exists(objectID)) {
-			return Response.status(Status.NOT_FOUND).build();
+			return notFound(ObjectType.SPECIMEN, objectID);
 		}
 		ContentNegotiator negotiator = ContentNegotiatorFactory.getInstance().forSpecimens(accept);
 		MediaType mediaType;
@@ -48,6 +55,9 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 			mediaType = negotiator.negotiate();
 		}
 		if (mediaType == null) {
+			if (debug) {
+				return notAcceptableDebug(negotiator.getAlternatives(getMultiMedia()));
+			}
 			return Response.notAcceptable(negotiator.getAlternatives(getMultiMedia())).build();
 		}
 		return Response.temporaryRedirect(getLocation(mediaType)).build();
@@ -71,8 +81,8 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		StringBuilder url = new StringBuilder(128);
 		url.append(Registry.getInstance().getBioportalBaseUrl());
 		url.append("/nba/result?nba_request=");
-		url.append(urlEncode("specimen/get-specimen/?unitID="));
-		url.append(urlEncode(objectID));
+		url.append(ResourceUtil.urlEncode("specimen/get-specimen/?unitID="));
+		url.append(ResourceUtil.urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 
@@ -82,7 +92,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		StringBuilder url = new StringBuilder(128);
 		url.append(Registry.getInstance().getNbaBaseUrl());
 		url.append("/specimen/find/");
-		url.append(urlEncode(objectID));
+		url.append(ResourceUtil.urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 

@@ -14,9 +14,10 @@ import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
 
 /**
- * A {@code ContentNegotiator} establishes the type of content to be served by
- * comparing the Accept headers in the HTTP request with the available content
- * types.
+ * A {@code ContentNegotiator} establishes the type of content to be served to
+ * the client by comparing Accept headers with the actually available content
+ * types for the requested object. N.B. content type is more formally known as
+ * media type.
  * 
  * @author Ayco Holleman
  *
@@ -26,8 +27,8 @@ public class ContentNegotiator {
 	/**
 	 * Retrieve Accept headers from the HTTP request and convert them to an
 	 * array of {@code MediaType} instances. You can mimic Accept headers (for
-	 * debugging purposes) by adding an "__accept" query to the PURL. If you do
-	 * this, the actual Accept headers (if any) will be ignored.
+	 * debugging purposes) by adding an "__accept" query parameter to the PURL.
+	 * If you do this, the actual Accept headers (if any) will be ignored.
 	 * 
 	 * @param request
 	 * @return
@@ -204,7 +205,7 @@ public class ContentNegotiator {
 
 	private static MediaType[] getRequestedMediaTypesDebug(String requestParam)
 	{
-		String[] chunks = requestParam.split(";");
+		String[] chunks = requestParam.split("|");
 		List<MediaType> types = new ArrayList<>(chunks.length);
 		for (String chunk : chunks) {
 			try {

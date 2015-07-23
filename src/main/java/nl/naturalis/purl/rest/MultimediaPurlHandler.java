@@ -1,16 +1,19 @@
 package nl.naturalis.purl.rest;
 
+import static nl.naturalis.purl.rest.ResourceUtil.notFound;
+import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
+
 import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.MultiMediaObject;
+import nl.naturalis.nda.domain.ObjectType;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
 import nl.naturalis.purl.Registry;
 
@@ -32,12 +35,15 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 	}
 
 
+	/**
+	 * @see AbstractPurlHandler#doHandle()
+	 */
 	@Override
 	protected Response doHandle() throws Exception
 	{
 		nbaResult = Registry.getInstance().getMultiMediaClient().find(objectID);
 		if (nbaResult == null) {
-			return Response.status(Status.NOT_FOUND).build();
+			return notFound(ObjectType.MULTIMEDIA, objectID);
 		}
 		ContentNegotiator negotiator = ContentNegotiatorFactory.getInstance().forMultimedia(accept);
 		MediaType mediaType;
@@ -49,6 +55,9 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 		}
 		if (mediaType == null) {
 			MultiMediaObject[] multimedia = new MultiMediaObject[] { nbaResult };
+			if (debug) {
+				return notAcceptableDebug(negotiator.getAlternatives(multimedia));
+			}
 			return Response.notAcceptable(negotiator.getAlternatives(multimedia)).build();
 		}
 		return Response.temporaryRedirect(getLocation(mediaType)).build();
@@ -72,8 +81,8 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 		StringBuilder url = new StringBuilder(128);
 		url.append(Registry.getInstance().getBioportalBaseUrl());
 		url.append("/nba/result?nba_request=");
-		url.append(urlEncode("multimedia/get-multimedia/?unitID="));
-		url.append(urlEncode(objectID));
+		url.append(ResourceUtil.urlEncode("multimedia/get-multimedia/?unitID="));
+		url.append(ResourceUtil.urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 
@@ -83,7 +92,7 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 		StringBuilder url = new StringBuilder(128);
 		url.append(Registry.getInstance().getNbaBaseUrl());
 		url.append("/multimedia/find/");
-		url.append(urlEncode(objectID));
+		url.append(ResourceUtil.urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 
