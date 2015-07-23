@@ -1,8 +1,6 @@
 package nl.naturalis.purl.rest;
 
-import static nl.naturalis.purl.rest.ResourceUtil.notFound;
-import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
-
+import static nl.naturalis.purl.rest.ResourceUtil.*;
 import java.net.URI;
 import java.util.Set;
 
@@ -60,7 +58,10 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 			}
 			return Response.notAcceptable(negotiator.getAlternatives(multimedia)).build();
 		}
-		return Response.temporaryRedirect(getLocation(mediaType)).build();
+		if (debug) {
+			return redirectDebug(getLocation(mediaType));
+		}
+		return redirect(getLocation(mediaType));
 	}
 
 

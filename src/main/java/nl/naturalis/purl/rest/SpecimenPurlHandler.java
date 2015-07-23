@@ -1,7 +1,6 @@
 package nl.naturalis.purl.rest;
 
-import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
-import static nl.naturalis.purl.rest.ResourceUtil.notFound;
+import static nl.naturalis.purl.rest.ResourceUtil.*;
 
 import java.net.URI;
 import java.util.Set;
@@ -10,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import nl.naturalis.nda.client.MultiMediaClient;
 import nl.naturalis.nda.client.NBAResourceException;
@@ -27,6 +29,8 @@ import nl.naturalis.purl.Registry;
  *
  */
 public class SpecimenPurlHandler extends AbstractPurlHandler {
+
+	private static final Logger logger = LoggerFactory.getLogger(SpecimenPurlHandler.class);
 
 	private MultiMediaObject[] multimedia;
 
@@ -58,9 +62,12 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 			if (debug) {
 				return notAcceptableDebug(negotiator.getAlternatives(getMultiMedia()));
 			}
-			return Response.notAcceptable(negotiator.getAlternatives(getMultiMedia())).build();
+			return notAcceptable(negotiator.getAlternatives(getMultiMedia()));
 		}
-		return Response.temporaryRedirect(getLocation(mediaType)).build();
+		if (debug) {
+			return redirectDebug(getLocation(mediaType));
+		}
+		return redirect(getLocation(mediaType));
 	}
 
 

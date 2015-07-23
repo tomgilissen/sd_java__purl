@@ -1,5 +1,8 @@
 package nl.naturalis.purl.rest;
 
+import static nl.naturalis.purl.rest.ResourceUtil.serverError;
+import static nl.naturalis.purl.rest.ResourceUtil.serverErrorDebug;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -7,7 +10,9 @@ import javax.ws.rs.core.UriInfo;
 
 import nl.naturalis.nda.client.NBAResourceException;
 
-import static nl.naturalis.purl.rest.ResourceUtil.*;
+import org.domainobject.util.ArrayUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for classes capable of handling PURL requests. Implements
@@ -23,6 +28,8 @@ import static nl.naturalis.purl.rest.ResourceUtil.*;
  *
  */
 public abstract class AbstractPurlHandler implements PurlHandler {
+
+	private static final Logger logger = LoggerFactory.getLogger(AbstractPurlHandler.class);
 
 	protected final HttpServletRequest request;
 	protected final UriInfo uriInfo;
@@ -49,10 +56,16 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	 */
 	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
+		if(logger.isDebugEnabled()) {
+			logger.debug("Creating handler for " + uriInfo.getPath());
+		}
 		this.request = request;
 		this.uriInfo = uriInfo;
 		this.objectID = uriInfo.getPathParameters().getFirst("objectID");
 		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Accepted media types: " + ArrayUtil.implode(accept));
+		}
 		String val = uriInfo.getQueryParameters().getFirst("__debug");
 		if (val != null && (val.length() == 0 || val.toLowerCase().equals("true"))) {
 			this.debug = true;

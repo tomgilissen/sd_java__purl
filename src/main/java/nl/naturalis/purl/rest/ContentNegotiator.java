@@ -13,6 +13,9 @@ import javax.ws.rs.core.Variant;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A {@code ContentNegotiator} establishes the type of content to be served to
  * the client by comparing Accept headers with the actually available content
@@ -24,29 +27,45 @@ import nl.naturalis.nda.domain.ServiceAccessPoint;
  */
 public class ContentNegotiator {
 
+	private static final Logger logger = LoggerFactory.getLogger(ContentNegotiator.class);
+
+
 	/**
 	 * Retrieve Accept headers from the HTTP request and convert them to an
-	 * array of {@code MediaType} instances. You can mimic Accept headers (for
-	 * debugging purposes) by adding an "__accept" query parameter to the PURL.
-	 * If you do this, the actual Accept headers (if any) will be ignored.
+	 * array of {@code MediaType} instances. Note that clients can supply
+	 * multiple Accept headers, but they can also supply one Accept header with
+	 * a comma-separated list of media types, or they could do both. For debug
+	 * purposes you can mimic Accept headers by adding an "__accept" query
+	 * parameter to the PURL. If you do this, the actual Accept headers (if any)
+	 * will be ignored.
 	 * 
 	 * @param request
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static MediaType[] getRequestedMediaTypes(HttpServletRequest request)
 	{
-		String param = request.getParameter("__accept");
-		if (param != null) {
-			return getRequestedMediaTypesDebug(param);
+		String acceptParam = request.getParameter("__accept");
+		if (acceptParam != null) {
+			return getRequestedMediaTypesDebug(acceptParam);
 		}
 		List<MediaType> types = new ArrayList<>();
 		Enumeration<String> acceptHeaders = request.getHeaders("Accept");
 		while (acceptHeaders.hasMoreElements()) {
-			try {
-				types.add(MediaType.valueOf(acceptHeaders.nextElement()));
-			}
-			catch (IllegalArgumentException e) {
-				// Ignore accept headers that JAX-RS cannot parse
+			String acceptHeader = acceptHeaders.nextElement();
+			String[] mediaTypes = acceptHeader.split(",");
+			for (String one : mediaTypes) {
+				try {
+					types.add(MediaType.valueOf(one));
+				}
+				catch (IllegalArgumentException e) {
+					if (mediaTypes.length == 1) {
+						logger.warn("Invalid Accept header in request: \"" + one + "\" (ignored)");
+					}
+					else {
+						logger.warn("Invalid media type in Accept header: \"" + one + "\" (ignored)");
+					}
+				}
 			}
 		}
 		return types.toArray(new MediaType[types.size()]);
@@ -205,14 +224,14 @@ public class ContentNegotiator {
 
 	private static MediaType[] getRequestedMediaTypesDebug(String requestParam)
 	{
-		String[] chunks = requestParam.split("|");
+		String[] chunks = requestParam.split(",");
 		List<MediaType> types = new ArrayList<>(chunks.length);
 		for (String chunk : chunks) {
 			try {
 				types.add(MediaType.valueOf(chunk));
 			}
 			catch (IllegalArgumentException e) {
-				// Ignore accept headers that JAX-RS cannot parse
+				logger.warn("Invalid media type in __accept parameter: \"" + chunk + "\" (ignored)");
 			}
 		}
 		return types.toArray(new MediaType[types.size()]);

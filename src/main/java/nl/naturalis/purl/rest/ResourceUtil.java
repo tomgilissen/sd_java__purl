@@ -1,6 +1,7 @@
 package nl.naturalis.purl.rest;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -53,6 +54,19 @@ public class ResourceUtil {
 	}
 
 
+	public static Response redirect(URI location)
+	{
+		return Response.temporaryRedirect(location).build();
+	}
+
+
+	public static Response redirectDebug(URI location)
+	{
+		String message = "307 (TEMPORARY REDIRECT)\n" + location;
+		return plainTextResponse(message);
+	}
+
+
 	/**
 	 * Generate an HTTP response with status 500 (INTERNAL SERVER ERROR) and the
 	 * specified message in the response body. The content type of the response
@@ -80,7 +94,7 @@ public class ResourceUtil {
 	public static Response serverErrorDebug(String message)
 	{
 		message = "500 (INTERNAL SERVER ERROR)\n" + message;
-		return Response.ok().type(MediaType.TEXT_PLAIN).entity(message).build();
+		return plainTextResponse(message);
 	}
 
 
@@ -94,9 +108,23 @@ public class ResourceUtil {
 	 */
 	public static Response notFound(ObjectType objectType, String objectID)
 	{
-		String fmt = "404 (NOT FOUND)\nNo %s exists with ID %s";
-		String msg = String.format(fmt, objectType, objectID);
-		return Response.status(404).type(MediaType.TEXT_PLAIN).entity(msg).build();
+		String message = String.format("404 (NOT FOUND)\nNo %s exists with ID %s", objectType, objectID);
+		return plainTextResponse(message);
+	}
+
+
+	public static Response notAcceptable(List<Variant> variants)
+	{
+		StringBuilder sb = new StringBuilder(200);
+		sb.append("406 (NOT ACCEPTABLE)\nNone of the requested media types can be served.");
+		sb.append("\nAcceptable media types for this object: ");
+		if (variants == null || variants.size() == 0) {
+			sb.append(" none!");
+		}
+		else {
+			sb.append(getVariantsAsString(variants));
+		}
+		return Response.notAcceptable(variants).build();
 	}
 
 
@@ -117,18 +145,28 @@ public class ResourceUtil {
 			sb.append(" none!");
 		}
 		else {
-			boolean first = true;
-			for (Variant v : variants) {
-				if (first) {
-					first = false;
-				}
-				else {
-					sb.append(',');
-				}
-				sb.append(v.getMediaType().toString());
-			}
+			sb.append(getVariantsAsString(variants));
 		}
-		return Response.ok().type(MediaType.TEXT_PLAIN).entity(sb.toString()).build();
+		return plainTextResponse(sb.toString());
+	}
+
+
+	public static Response plainTextResponse(String message)
+	{
+		return Response.ok(message, MediaType.TEXT_PLAIN).build();
+	}
+
+
+	private static String getVariantsAsString(List<Variant> variants)
+	{
+		StringBuilder sb = new StringBuilder(64);
+		for (int i = 0; i < variants.size(); ++i) {
+			if (i != 0) {
+				sb.append(',');
+			}
+			sb.append(variants.get(i).getMediaType().toString());
+		}
+		return sb.toString();
 	}
 
 }
