@@ -54,6 +54,12 @@ public class ResourceUtil {
 	}
 
 
+	/**
+	 * Performs a 303 (See Other) redirect to the specified location
+	 * 
+	 * @param location
+	 * @return
+	 */
 	public static Response redirect(URI location)
 	{
 		return Response.seeOther(location).build();

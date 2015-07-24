@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Naturalis PURL Server</title>
+</head>
+<body>
+<h1>Naturalis PURL server</h1>
+<p>
+Welcome to the Naturalis PURL server. Naturalis is in the process of creating
+persistent URLs (PURLs) for its main assets. Currently we have PURLs for our
+collection objects (specimens) and our multimedia objects (mostly images of
+collection objects). You are requested to refer to our specimens and multimedia
+by means of their PURL, rather than through URLs from, for example, the
+<a href="http://bioportal.naturalis.nl">Naturalis Bioportal</a> or our media library. The PURL server will forward
+</p>
+<h2>Specimen PURLs</h2>
+<p>PURLs for our collection object take the following form:</p>
+<pre>http://localhost:8080/purl/naturalis/specimen/{ObjectID}</pre>
+<p>Substitute {ObjectID} with an actual specimen ID. For example:
+<a href="http://localhost:8080/purl/naturalis/specimen/U.1040749">http://localhost:8080/purl/naturalis/specimen/U.1040749</a>
+</p>
+<h2>Multimedia PURLs</h2>
+<p>PURLs for our collection object take the following form:</p>
+<pre>http://localhost:8080/purl/naturalis/multimedia/{ObjectID}</pre>
+<p>Substitute {ObjectID} with an actual specimen ID. For example:
+<a href="http://localhost:8080/purl/naturalis/multimedia/U.1040749">http://localhost:8080/purl/naturalis/multimedia/U.1040749:383445478</a>
+</p>
+<h2>Content Negotiation</h2>
+<p>You can request different representations of the object specified by the PURL</p>
+</body>
+</html>

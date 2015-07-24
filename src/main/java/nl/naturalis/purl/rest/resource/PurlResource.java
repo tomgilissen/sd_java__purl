@@ -27,6 +27,11 @@ public class PurlResource {
 
 	@Context
 	private UriInfo uriInfo;
+	
+	@GET
+	public String welcome() {
+		
+	}
 
 
 	/**
