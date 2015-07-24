@@ -56,7 +56,7 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 			if (debug) {
 				return notAcceptableDebug(negotiator.getAlternatives(multimedia));
 			}
-			return Response.notAcceptable(negotiator.getAlternatives(multimedia)).build();
+			return notAcceptable(negotiator.getAlternatives(multimedia));
 		}
 		if (debug) {
 			return redirectDebug(getLocation(mediaType));

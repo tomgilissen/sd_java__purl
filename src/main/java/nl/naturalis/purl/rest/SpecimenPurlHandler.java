@@ -1,6 +1,10 @@
 package nl.naturalis.purl.rest;
 
-import static nl.naturalis.purl.rest.ResourceUtil.*;
+import static nl.naturalis.purl.rest.ResourceUtil.notAcceptable;
+import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
+import static nl.naturalis.purl.rest.ResourceUtil.notFound;
+import static nl.naturalis.purl.rest.ResourceUtil.redirect;
+import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
 
 import java.net.URI;
 import java.util.Set;
@@ -10,16 +14,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import nl.naturalis.nda.client.MultiMediaClient;
 import nl.naturalis.nda.client.NBAResourceException;
+import nl.naturalis.nda.client.SpecimenClient;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ObjectType;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
 import nl.naturalis.purl.PurlException;
 import nl.naturalis.purl.Registry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link PurlHandler} capable of handling PURLs for specimen objects.
@@ -30,6 +34,7 @@ import nl.naturalis.purl.Registry;
  */
 public class SpecimenPurlHandler extends AbstractPurlHandler {
 
+	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(SpecimenPurlHandler.class);
 
 	private MultiMediaObject[] multimedia;
@@ -136,8 +141,8 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	private MultiMediaObject[] getMultiMedia() throws NBAResourceException
 	{
 		if (multimedia == null) {
-			MultiMediaClient client = Registry.getInstance().getMultiMediaClient();
-			multimedia = client.getMultiMediaForSpecimen(objectID);
+			SpecimenClient client = Registry.getInstance().getSpecimenClient();
+			multimedia = client.getMultiMedia(objectID);
 		}
 		return multimedia;
 	}

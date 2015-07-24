@@ -204,6 +204,8 @@ public class ContentNegotiator {
 		return alternatives;
 	}
 
+	private static final MediaType jpeg = new MediaType("image", "jpeg");
+
 
 	private static Set<MediaType> extractMediaTypes(MultiMediaObject[] multimedia)
 	{
@@ -212,9 +214,17 @@ public class ContentNegotiator {
 			if (mmo.getServiceAccessPoints() != null) {
 				Set<ServiceAccessPoint.Variant> variants = mmo.getServiceAccessPoints().keySet();
 				for (ServiceAccessPoint.Variant variant : variants) {
-					ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
-					MediaType mediaType = MediaType.valueOf(sap.getFormat());
-					mediaTypes.add(mediaType);
+					if (mmo.getServiceAccessPoints() != null) {
+						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
+						if (sap.getFormat() == null || sap.getFormat().length() == 0) {
+							// TODO: HACK. Media type not always set. Solve in import!
+							mediaTypes.add(jpeg);
+						}
+						else {
+							MediaType mediaType = MediaType.valueOf(sap.getFormat());
+							mediaTypes.add(mediaType);
+						}
+					}
 				}
 			}
 		}

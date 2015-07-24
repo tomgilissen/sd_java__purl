@@ -56,13 +56,13 @@ public class ResourceUtil {
 
 	public static Response redirect(URI location)
 	{
-		return Response.temporaryRedirect(location).build();
+		return Response.seeOther(location).build();
 	}
 
 
 	public static Response redirectDebug(URI location)
 	{
-		String message = "307 (TEMPORARY REDIRECT)\n" + location;
+		String message = "303 (SEE OTHER)\n" + location;
 		return plainTextResponse(message);
 	}
 
@@ -78,7 +78,7 @@ public class ResourceUtil {
 	public static Response serverError(String message)
 	{
 		message = "500 (INTERNAL SERVER ERROR)\n" + message;
-		return Response.serverError().type(MediaType.TEXT_PLAIN).entity(message).build();
+		return plainTextResponse(500, message);
 	}
 
 
@@ -109,7 +109,7 @@ public class ResourceUtil {
 	public static Response notFound(ObjectType objectType, String objectID)
 	{
 		String message = String.format("404 (NOT FOUND)\nNo %s exists with ID %s", objectType, objectID);
-		return plainTextResponse(message);
+		return plainTextResponse(404, message);
 	}
 
 
@@ -124,7 +124,7 @@ public class ResourceUtil {
 		else {
 			sb.append(getVariantsAsString(variants));
 		}
-		return Response.notAcceptable(variants).build();
+		return Response.notAcceptable(variants).entity(sb.toString()).type(MediaType.TEXT_PLAIN).build();
 	}
 
 
@@ -154,6 +154,12 @@ public class ResourceUtil {
 	public static Response plainTextResponse(String message)
 	{
 		return Response.ok(message, MediaType.TEXT_PLAIN).build();
+	}
+
+
+	public static Response plainTextResponse(int status, String message)
+	{
+		return Response.status(status).entity(message).type(MediaType.TEXT_PLAIN).build();
 	}
 
 
