@@ -13,7 +13,6 @@ import nl.naturalis.purl.rest.MultimediaPurlHandler;
 import nl.naturalis.purl.rest.PurlHandler;
 import nl.naturalis.purl.rest.SpecimenPurlHandler;
 
-import org.domainobject.util.FileUtil;
 import org.domainobject.util.StringUtil;
 
 /**
@@ -36,6 +35,7 @@ public class PurlResource {
 
 	/**
 	 * Show some welcome content at the root.
+	 * 
 	 * @return
 	 */
 	@GET
@@ -43,6 +43,10 @@ public class PurlResource {
 	public String welcome()
 	{
 		String html = StringUtil.fromInputStream(getClass().getResourceAsStream("welcome.html"));
+		String baseUri = uriInfo.getBaseUri().toString();
+		if (!baseUri.endsWith("/")) {
+			baseUri = baseUri + "/";
+		}
 		html = html.replaceAll("@BASEURL@", uriInfo.getBaseUri().toString());
 		return html;
 	}
