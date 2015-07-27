@@ -14,6 +14,8 @@ import nl.naturalis.purl.rest.PurlHandler;
 import nl.naturalis.purl.rest.SpecimenPurlHandler;
 
 import org.domainobject.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Central class of the PURL service. Provides endpoints for PURLs, but
@@ -25,6 +27,9 @@ import org.domainobject.util.StringUtil;
  */
 @Path("/")
 public class PurlResource {
+
+	@SuppressWarnings("unused")
+	private static final Logger logger = LoggerFactory.getLogger(PurlResource.class);
 
 	@Context
 	private HttpServletRequest request;
@@ -47,7 +52,7 @@ public class PurlResource {
 		if (!baseUri.endsWith("/")) {
 			baseUri = baseUri + "/";
 		}
-		html = html.replaceAll("@BASEURL@", uriInfo.getBaseUri().toString());
+		html = html.replaceAll("@BASEURL@", baseUri);
 		return html;
 	}
 
