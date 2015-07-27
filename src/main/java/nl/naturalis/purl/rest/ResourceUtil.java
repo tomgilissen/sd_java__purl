@@ -66,6 +66,13 @@ public class ResourceUtil {
 	}
 
 
+	/**
+	 * Shows the location to which the PURL server would redirect, but does not
+	 * actually redirect.
+	 * 
+	 * @param location
+	 * @return
+	 */
 	public static Response redirectDebug(URI location)
 	{
 		String message = "303 (SEE OTHER)\n" + location;
@@ -105,9 +112,8 @@ public class ResourceUtil {
 
 
 	/**
-	 * Generate an HTTP response with status 404 (NOT FOUND) and the specified
-	 * message in the response body. The content type of the response body is
-	 * set to text/plain.
+	 * Generate a 404 (NOT FOUND) response with the specified message in the
+	 * response body.
 	 * 
 	 * @param message
 	 * @return
@@ -119,6 +125,14 @@ public class ResourceUtil {
 	}
 
 
+	/**
+	 * Generate a 406 (NOT ACCEPTABLE) response with the specified list of
+	 * acceptable alternative media types both in the response header and the
+	 * response body.
+	 * 
+	 * @param variants
+	 * @return
+	 */
 	public static Response notAcceptable(List<Variant> variants)
 	{
 		StringBuilder sb = new StringBuilder(200);
@@ -157,12 +171,27 @@ public class ResourceUtil {
 	}
 
 
+	/**
+	 * Generate a 200 (OK) response with the specified message in the response
+	 * body and a Content-Type header of text/plain.
+	 * 
+	 * @param message
+	 * @return
+	 */
 	public static Response plainTextResponse(String message)
 	{
 		return Response.ok(message, MediaType.TEXT_PLAIN).build();
 	}
 
 
+	/**
+	 * Generate a response with the specified HTTP status code, the specified
+	 * message in the reponse body and a Content-Type header of text/plain.
+	 * 
+	 * @param status
+	 * @param message
+	 * @return
+	 */
 	public static Response plainTextResponse(int status, String message)
 	{
 		return Response.status(status).entity(message).type(MediaType.TEXT_PLAIN).build();

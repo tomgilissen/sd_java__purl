@@ -34,6 +34,10 @@ public class PurlResource {
 	private UriInfo uriInfo;
 
 
+	/**
+	 * Show some welcome content at the root.
+	 * @return
+	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public String welcome()
