@@ -3,13 +3,18 @@ package nl.naturalis.purl.rest.resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import nl.naturalis.purl.rest.MultimediaPurlHandler;
 import nl.naturalis.purl.rest.PurlHandler;
 import nl.naturalis.purl.rest.SpecimenPurlHandler;
+
+import org.domainobject.util.FileUtil;
+import org.domainobject.util.StringUtil;
 
 /**
  * Central class of the PURL service. Provides endpoints for PURLs, but
@@ -27,10 +32,15 @@ public class PurlResource {
 
 	@Context
 	private UriInfo uriInfo;
-	
+
+
 	@GET
-	public String welcome() {
-		
+	@Produces(MediaType.TEXT_HTML)
+	public String welcome()
+	{
+		String html = StringUtil.fromInputStream(getClass().getResourceAsStream("welcome.html"));
+		html = html.replaceAll("@BASEURL@", uriInfo.getBaseUri().toString());
+		return html;
 	}
 
 
