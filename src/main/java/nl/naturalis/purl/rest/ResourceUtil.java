@@ -1,5 +1,7 @@
 package nl.naturalis.purl.rest;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -10,6 +12,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import nl.naturalis.nda.domain.ObjectType;
+
+import org.domainobject.util.debug.BeanPrinter;
 
 /**
  * Utility class providing useful REST-related functionality.
@@ -27,7 +31,19 @@ public class ResourceUtil {
 	 * charset parameter, some browsers or browser versions don't interpret the
 	 * response as expected.
 	 */
-	public static final String MEDIA_TYPE_JSON = "application/json;charset=UTF-8";
+	public static final String JSON = "application/json;charset=UTF-8";
+	/**
+	 * The {@link MediaType} corresponding to {@code JSON}.
+	 */
+	public static final MediaType JSON_TYPE = MediaType.valueOf(JSON);
+	/**
+	 * Defined as {@code image/jpeg}.
+	 */
+	public static final String JPEG = "image/jpeg";
+	/**
+	 * The {@link MediaType} corresponding to {@code JPEG}.
+	 */
+	public static final MediaType JPEG_TYPE = MediaType.valueOf(JPEG);
 
 
 	private ResourceUtil()
@@ -195,6 +211,21 @@ public class ResourceUtil {
 	public static Response plainTextResponse(int status, String message)
 	{
 		return Response.status(status).entity(message).type(MediaType.TEXT_PLAIN).build();
+	}
+
+
+	/**
+	 * Give a print-out of the specified object.
+	 * 
+	 * @param bean
+	 * @return
+	 */
+	public static String dump(Object bean)
+	{
+		StringWriter sw = new StringWriter(4096);
+		BeanPrinter bp = new BeanPrinter(new PrintWriter(sw));
+		bp.dump(bean);
+		return sw.toString();
 	}
 
 

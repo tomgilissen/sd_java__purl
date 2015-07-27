@@ -1,5 +1,7 @@
 package nl.naturalis.purl.rest;
 
+import static nl.naturalis.purl.rest.ResourceUtil.JPEG;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -204,9 +206,11 @@ public class ContentNegotiator {
 		return alternatives;
 	}
 
-	private static final MediaType jpeg = new MediaType("image", "jpeg");
 
-
+	/*
+	 * Extract the serviceAccessPoints.format field from the specified
+	 * MultiMediaObject instances.
+	 */
 	private static Set<MediaType> extractMediaTypes(MultiMediaObject[] multimedia)
 	{
 		Set<MediaType> mediaTypes = new LinkedHashSet<>();
@@ -216,14 +220,9 @@ public class ContentNegotiator {
 				for (ServiceAccessPoint.Variant variant : variants) {
 					if (mmo.getServiceAccessPoints() != null) {
 						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
-						if (sap.getFormat() == null || sap.getFormat().length() == 0) {
-							// TODO: HACK. Media type not always set. Solve in import!
-							mediaTypes.add(jpeg);
-						}
-						else {
-							MediaType mediaType = MediaType.valueOf(sap.getFormat());
-							mediaTypes.add(mediaType);
-						}
+						// TODO: HACK. Media type not always set. Solve in import!
+						String format = sap.getFormat() == null ? JPEG : sap.getFormat();
+						mediaTypes.add(MediaType.valueOf(format));
 					}
 				}
 			}

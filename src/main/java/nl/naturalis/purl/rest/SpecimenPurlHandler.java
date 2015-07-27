@@ -5,6 +5,8 @@ import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
 import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
+import static nl.naturalis.purl.rest.ResourceUtil.urlEncode;
+import static nl.naturalis.purl.rest.ResourceUtil.JPEG;
 
 import java.net.URI;
 import java.util.Set;
@@ -34,7 +36,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SpecimenPurlHandler extends AbstractPurlHandler {
 
-	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(SpecimenPurlHandler.class);
 
 	private MultiMediaObject[] multimedia;
@@ -93,8 +94,8 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		StringBuilder url = new StringBuilder(128);
 		url.append(Registry.getInstance().getBioportalBaseUrl());
 		url.append("/nba/result?nba_request=");
-		url.append(ResourceUtil.urlEncode("specimen/get-specimen/?unitID="));
-		url.append(ResourceUtil.urlEncode(objectID));
+		url.append(urlEncode("specimen/get-specimen/?unitID="));
+		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 
@@ -104,12 +105,12 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		StringBuilder url = new StringBuilder(128);
 		url.append(Registry.getInstance().getNbaBaseUrl());
 		url.append("/specimen/find/");
-		url.append(ResourceUtil.urlEncode(objectID));
+		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 
 
-	private URI getMedialibUri(MediaType mediaType) throws NBAResourceException
+	private URI getMedialibUri(MediaType requested) throws NBAResourceException
 	{
 		MultiMediaObject[] multimedia = getMultiMedia();
 		if (multimedia != null) {
@@ -119,8 +120,10 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 					variants = mmo.getServiceAccessPoints().keySet();
 					for (ServiceAccessPoint.Variant variant : variants) {
 						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
-						MediaType sapMediaType = MediaType.valueOf(sap.getFormat());
-						if (sapMediaType.equals(mediaType)) {
+						// TODO: HACK. Media type not always set. Solve in import!
+						String format = sap.getFormat() == null ? JPEG : sap.getFormat();
+						MediaType provided = MediaType.valueOf(format);
+						if (provided.isCompatible(requested)) {
 							return sap.getAccessUri();
 						}
 					}
@@ -142,7 +145,12 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	{
 		if (multimedia == null) {
 			SpecimenClient client = Registry.getInstance().getSpecimenClient();
+			logger.info("Retrieving multimedia for specimen with UnitID " + objectID);
 			multimedia = client.getMultiMedia(objectID);
+			logger.info("Number of multimedia found: " + multimedia.length);
+			if (logger.isDebugEnabled()) {
+				logger.debug(ResourceUtil.dump(multimedia));
+			}
 		}
 		return multimedia;
 	}
