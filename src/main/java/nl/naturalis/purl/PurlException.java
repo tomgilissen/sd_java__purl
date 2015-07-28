@@ -1,7 +1,7 @@
 package nl.naturalis.purl;
 
 /**
- * Generic {@code Exception} class used within the PURL application.
+ * Base class for checked exceptions of PURL application.
  * 
  * @author Ayco Holleman
  * @created Jul 22, 2015

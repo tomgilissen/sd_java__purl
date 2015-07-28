@@ -44,12 +44,12 @@ public class Registry {
 
 
 	/**
-	 * Instantiates a {@code Registry} instance. Should be called before
-	 * handling any PURL request. If anything goes wrong while instantiating the
-	 * {@code Registry}, an {@link ApplicationInitializationException} is
-	 * thrown, causing the application to die already during startup. An
-	 * explanation of what went wrong is written to the Wildfly log
-	 * (standalone/log/server.log).
+	 * Instantiates and initializes a {@code Registry} instance. This method
+	 * must be called before handling any PURL request. If anything goes wrong
+	 * while initializing the {@code Registry}, an
+	 * {@link ApplicationInitializationException} is thrown, causing the PURL
+	 * server to die during startup. An explanation of what went wrong is
+	 * written to the Wildfly log (standalone/log/server.log).
 	 */
 	public static void initialize()
 	{
@@ -60,9 +60,10 @@ public class Registry {
 
 
 	/**
-	 * Return a {@code Registry} instance.
+	 * Return a {@code Registry} instance. Will call {@link #initialize()}
+	 * first.
 	 * 
-	 * @return The one and only instance of this class
+	 * @return A {@code Registry} instance.
 	 */
 	public static Registry getInstance()
 	{
@@ -73,13 +74,13 @@ public class Registry {
 
 	private Registry()
 	{
-		establishConfigDirectory();
-		loadConfiguration();
+		setConfDir();
+		loadConfig();
 	}
 
 
 	/**
-	 * Return a {@code ConfigObject} for the main configuration file
+	 * Get a {@code ConfigObject} for the main configuration file
 	 * (purl.properties).
 	 * 
 	 * @return
@@ -149,7 +150,7 @@ public class Registry {
 	}
 
 
-	private void establishConfigDirectory()
+	private void setConfDir()
 	{
 		String path = System.getProperty(SYSPROP_CONFIG_DIR);
 		if (path == null) {
@@ -171,7 +172,7 @@ public class Registry {
 	}
 
 
-	private void loadConfiguration()
+	private void loadConfig()
 	{
 		File file = FileUtil.newFile(confDir, CONFIG_FILE_NAME);
 		if (!file.isFile()) {

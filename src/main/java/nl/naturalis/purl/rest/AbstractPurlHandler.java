@@ -11,6 +11,7 @@ import javax.ws.rs.core.UriInfo;
 import nl.naturalis.nda.client.NBAResourceException;
 
 import org.domainobject.util.ArrayUtil;
+import org.domainobject.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
 		if(logger.isDebugEnabled()) {
-			logger.debug("Creating handler for " + uriInfo.getPath());
+			logger.debug("Creating " + getClass() + " for " + uriInfo.getPath());
 		}
 		this.request = request;
 		this.uriInfo = uriInfo;
@@ -67,12 +68,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 			logger.debug("Accepted media types: " + ArrayUtil.implode(accept));
 		}
 		String val = uriInfo.getQueryParameters().getFirst("__debug");
-		if (val != null && (val.length() == 0 || val.toLowerCase().equals("true"))) {
-			this.debug = true;
-		}
-		else {
-			this.debug = false;
-		}
+		this.debug = StringUtil.asBoolean(val);
 	}
 
 
