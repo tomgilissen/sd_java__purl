@@ -1,12 +1,12 @@
 package nl.naturalis.purl.rest;
 
+import static nl.naturalis.purl.rest.ResourceUtil.JPEG;
 import static nl.naturalis.purl.rest.ResourceUtil.notAcceptable;
 import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
 import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
 import static nl.naturalis.purl.rest.ResourceUtil.urlEncode;
-import static nl.naturalis.purl.rest.ResourceUtil.JPEG;
 
 import java.net.URI;
 import java.util.Set;
@@ -21,7 +21,6 @@ import nl.naturalis.nda.client.SpecimenClient;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ObjectType;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
-import nl.naturalis.purl.PurlException;
 import nl.naturalis.purl.Registry;
 
 import org.slf4j.Logger;
@@ -77,7 +76,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	}
 
 
-	private URI getLocation(MediaType mediaType) throws NBAResourceException, PurlException
+	private URI getLocation(MediaType mediaType) throws NBAResourceException
 	{
 		if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
 			return getBioportalUri();

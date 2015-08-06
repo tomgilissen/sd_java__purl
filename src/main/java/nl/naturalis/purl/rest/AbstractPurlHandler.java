@@ -68,7 +68,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 			logger.debug("Accepted media types: " + ArrayUtil.implode(accept));
 		}
 		String val = uriInfo.getQueryParameters().getFirst("__debug");
-		this.debug = StringUtil.asBoolean(val);
+		this.debug = StringUtil.isTrue(val);
 	}
 
 
@@ -87,17 +87,13 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 			if (debug) {
 				return serverErrorDebug(e.getServerInfoAsString());
 			}
-			else {
-				return serverError(e.getServerInfoAsString());
-			}
+			return serverError(e.getServerInfoAsString());
 		}
 		catch (Throwable t) {
 			if (debug) {
 				return serverErrorDebug(getStackTrace(t));
 			}
-			else {
-				return serverError(getStackTrace(t));
-			}
+			return serverError(getStackTrace(t));
 		}
 	}
 

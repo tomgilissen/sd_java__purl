@@ -9,8 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import nl.naturalis.purl.rest.MultimediaPurlHandler;
 import nl.naturalis.purl.rest.PurlHandler;
+import nl.naturalis.purl.rest.ResourceUtil;
 import nl.naturalis.purl.rest.SpecimenPurlHandler;
 
 import org.domainobject.util.StringUtil;
@@ -78,10 +78,12 @@ public class PurlResource {
 	 */
 	@GET
 	@Path("/naturalis/multimedia/{objectID}")
+	@SuppressWarnings("static-method")
 	public Response handleNaturalisMultimediaPurl()
 	{
-		PurlHandler handler = new MultimediaPurlHandler(request, uriInfo);
-		return handler.handlePurl();
+		return ResourceUtil.serverError("Under construction");
+//		PurlHandler handler = new MultimediaPurlHandler(request, uriInfo);
+//		return handler.handlePurl();
 	}
 
 }

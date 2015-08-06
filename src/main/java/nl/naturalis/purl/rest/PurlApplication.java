@@ -9,7 +9,6 @@ import nl.naturalis.purl.Registry;
  * JAX-RS framework class.
  * 
  * @author Ayco Holleman
- * @created Jul 22, 2015
  *
  */
 @ApplicationPath("/")

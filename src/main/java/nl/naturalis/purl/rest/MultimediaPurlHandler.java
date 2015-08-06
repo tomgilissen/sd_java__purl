@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import nl.naturalis.nda.client.NBAResourceException;
 import nl.naturalis.nda.domain.MultiMediaObject;
 import nl.naturalis.nda.domain.ObjectType;
 import nl.naturalis.nda.domain.ServiceAccessPoint;
@@ -40,9 +39,6 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 	}
 
 
-	/**
-	 * @see AbstractPurlHandler#doHandle()
-	 */
 	@Override
 	protected Response doHandle() throws Exception
 	{
@@ -72,7 +68,7 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 	}
 
 
-	private URI getLocation(MediaType mediaType) throws NBAResourceException
+	private URI getLocation(MediaType mediaType)
 	{
 		if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
 			return getBioportalUri();
@@ -105,7 +101,7 @@ public class MultimediaPurlHandler extends AbstractPurlHandler {
 	}
 
 
-	private URI getMedialibUri(MediaType requested) throws NBAResourceException
+	private URI getMedialibUri(MediaType requested)
 	{
 		Set<ServiceAccessPoint.Variant> variants = nbaResult.getServiceAccessPoints().keySet();
 		for (ServiceAccessPoint.Variant variant : variants) {
