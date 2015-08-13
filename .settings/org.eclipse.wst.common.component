@@ -11,10 +11,10 @@
         <dependent-module archiveName="nl.naturalis.nda.client.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nl.naturalis.nda.client/nl.naturalis.nda.client">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="org.domainobject.util.http.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.domainobject.util.http/org.domainobject.util.http">
+        <dependent-module archiveName="org.domainobject.util.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.domainobject.util/org.domainobject.util">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="org.domainobject.util.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.domainobject.util/org.domainobject.util">
+        <dependent-module archiveName="org.domainobject.util.http.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.domainobject.util.http/org.domainobject.util.http">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="nl.naturalis.purl"/>
