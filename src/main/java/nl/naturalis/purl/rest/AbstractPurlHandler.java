@@ -48,7 +48,6 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	 */
 	protected final boolean debug;
 
-
 	/**
 	 * Create a {@code PurlHandler} for the specified PURL request.
 	 * 
@@ -57,20 +56,20 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	 */
 	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
-		if(logger.isDebugEnabled()) {
-			logger.debug("Creating " + getClass() + " for " + uriInfo.getPath());
-		}
+		logger.info("Creating " + getClass().getSimpleName() + " for " + uriInfo.getPath());
 		this.request = request;
 		this.uriInfo = uriInfo;
 		this.objectID = uriInfo.getPathParameters().getFirst("objectID");
 		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
-		if(logger.isDebugEnabled()) {
-			logger.debug("Accepted media types: " + ArrayUtil.implode(accept));
+		logger.info("Accepted media types: " + ArrayUtil.implode(accept));
+		if (uriInfo.getQueryParameters().containsKey("__debug")) {
+			String val = uriInfo.getQueryParameters().getFirst("__debug");
+			this.debug = StringUtil.isTrue(val, true);
 		}
-		String val = uriInfo.getQueryParameters().getFirst("__debug");
-		this.debug = StringUtil.isTrue(val);
+		else {
+			this.debug = false;
+		}
 	}
-
 
 	/**
 	 * Implements {@link PurlHandler#handlePurl()}.
@@ -97,7 +96,6 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		}
 	}
 
-
 	/**
 	 * Template method to be implemented by concrete subclasses. Subclasses are
 	 * allowed and encouraged to throw any exception that should lead to a
@@ -107,7 +105,6 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	 * @throws Exception
 	 */
 	protected abstract Response doHandle() throws Exception;
-
 
 	private static String getStackTrace(Throwable t)
 	{

@@ -39,12 +39,10 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 
 	private MultiMediaObject[] multimedia;
 
-
 	public SpecimenPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
 		super(request, uriInfo);
 	}
-
 
 	/**
 	 * @see AbstractPurlHandler#doHandle()
@@ -75,7 +73,6 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		return redirect(getLocation(mediaType));
 	}
 
-
 	private URI getLocation(MediaType mediaType) throws NBAResourceException
 	{
 		if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
@@ -87,7 +84,6 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		return getMedialibUri(mediaType);
 	}
 
-
 	private URI getBioportalUri()
 	{
 		StringBuilder url = new StringBuilder(128);
@@ -98,7 +94,6 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		return URI.create(url.toString());
 	}
 
-
 	private URI getNbaUri()
 	{
 		StringBuilder url = new StringBuilder(128);
@@ -107,7 +102,6 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
 	}
-
 
 	private URI getMedialibUri(MediaType requested) throws NBAResourceException
 	{
@@ -119,7 +113,8 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 					variants = mmo.getServiceAccessPoints().keySet();
 					for (ServiceAccessPoint.Variant variant : variants) {
 						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
-						// TODO: HACK. Media type not always set. Solve in import!
+						// TODO: HACK. Media type not always set. Solve in
+						// import!
 						String format = sap.getFormat() == null ? JPEG : sap.getFormat();
 						MediaType provided = MediaType.valueOf(format);
 						if (provided.isCompatible(requested)) {
@@ -130,15 +125,14 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 			}
 		}
 		/*
-		 * Because the content negotiator has iterated through the exact same
+		 * Because the content negotiator has iterated over the exact same
 		 * multimedia objects to see which media types are available for the
-		 * requested object, and if one of them matches what the client wants,
-		 * we should never get here.
+		 * requested object, and to check if one of them matches what the client
+		 * wants, we should never get here.
 		 */
 		assert (false);
 		return null;
 	}
-
 
 	private MultiMediaObject[] getMultiMedia() throws NBAResourceException
 	{
@@ -147,7 +141,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 			logger.info("Retrieving multimedia for specimen with UnitID " + objectID);
 			multimedia = client.getMultiMedia(objectID);
 			logger.info("Number of multimedia found: " + multimedia.length);
-			if (logger.isDebugEnabled()) {
+			if (multimedia.length != 0 && logger.isDebugEnabled()) {
 				logger.debug(ResourceUtil.dump(multimedia));
 			}
 		}

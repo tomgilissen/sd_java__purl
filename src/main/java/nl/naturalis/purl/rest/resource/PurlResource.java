@@ -78,7 +78,6 @@ public class PurlResource {
 	 */
 	@GET
 	@Path("/naturalis/multimedia/{objectID}")
-	@SuppressWarnings("static-method")
 	public Response handleNaturalisMultimediaPurl()
 	{
 		return ResourceUtil.serverError("Under construction");
