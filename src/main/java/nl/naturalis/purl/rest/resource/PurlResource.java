@@ -37,7 +37,6 @@ public class PurlResource {
 	@Context
 	private UriInfo uriInfo;
 
-
 	/**
 	 * Show some welcome content at the root.
 	 * 
@@ -48,14 +47,8 @@ public class PurlResource {
 	public String welcome()
 	{
 		String html = StringUtil.fromInputStream(getClass().getResourceAsStream("welcome.html"));
-		String baseUri = uriInfo.getBaseUri().toString();
-		if (!baseUri.endsWith("/")) {
-			baseUri = baseUri + "/";
-		}
-		html = html.replaceAll("@BASEURL@", baseUri);
 		return html;
 	}
-
 
 	/**
 	 * Endpoint for specimen PURLs.
@@ -70,7 +63,6 @@ public class PurlResource {
 		return handler.handlePurl();
 	}
 
-
 	/**
 	 * Endpoint for multimedia PURLs.
 	 * 
@@ -81,8 +73,8 @@ public class PurlResource {
 	public Response handleNaturalisMultimediaPurl()
 	{
 		return ResourceUtil.serverError("Under construction");
-//		PurlHandler handler = new MultimediaPurlHandler(request, uriInfo);
-//		return handler.handlePurl();
+		// PurlHandler handler = new MultimediaPurlHandler(request, uriInfo);
+		// return handler.handlePurl();
 	}
 
 }
