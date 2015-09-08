@@ -4,4 +4,6 @@
 	<target name="collect-dependencies">
 		<ivy:retrieve pattern="WebContent/WEB-INF/lib/[artifact]-[revision](-[classifier]).[ext]" log="download-only" />
 	</target>
+	
+		
 </project>
