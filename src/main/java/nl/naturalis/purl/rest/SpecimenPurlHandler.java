@@ -116,8 +116,8 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 						// TODO: HACK. Media type not always set. Solve in
 						// import!
 						String format = sap.getFormat() == null ? JPEG : sap.getFormat();
-						MediaType provided = MediaType.valueOf(format);
-						if (provided.isCompatible(requested)) {
+						MediaType available = MediaType.valueOf(format);
+						if (available.isCompatible(requested)) {
 							return sap.getAccessUri();
 						}
 					}

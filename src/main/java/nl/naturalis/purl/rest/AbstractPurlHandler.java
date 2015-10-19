@@ -59,7 +59,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		logger.info("Creating " + getClass().getSimpleName() + " for " + uriInfo.getPath());
 		this.request = request;
 		this.uriInfo = uriInfo;
-		this.objectID = uriInfo.getPathParameters().getFirst("objectID");
+		this.objectID = uriInfo.getPathParameters(true).getFirst("objectID");
 		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
 		logger.info("Accepted media types: " + ArrayUtil.implode(accept));
 		if (uriInfo.getQueryParameters().containsKey("__debug")) {
@@ -83,23 +83,22 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 			return response;
 		}
 		catch (NBAResourceException e) {
-			if (debug) {
+			if (debug)
 				return serverErrorDebug(e.getServerInfoAsString());
-			}
 			return serverError(e.getServerInfoAsString());
 		}
 		catch (Throwable t) {
-			if (debug) {
+			if (debug)
 				return serverErrorDebug(getStackTrace(t));
-			}
 			return serverError(getStackTrace(t));
 		}
 	}
 
 	/**
 	 * Template method to be implemented by concrete subclasses. Subclasses are
-	 * allowed and encouraged to throw any exception that should lead to a
-	 * server error directly out of the {@code doHandle} method.
+	 * allowed and encouraged to throw any exception that should trigger a
+	 * server error (500) directly out of the {@code doHandle} method so it will
+	 * be dealt with in a uniform way.
 	 * 
 	 * @return The HTTP response to be sent back to the client.
 	 * @throws Exception

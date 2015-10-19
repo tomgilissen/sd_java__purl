@@ -136,7 +136,7 @@ public class ResourceUtil {
 	 */
 	public static Response notFound(ObjectType objectType, String objectID)
 	{
-		String message = String.format("404 (NOT FOUND)\nNo %s exists with ID %s", objectType, objectID);
+		String message = String.format("404 (NOT FOUND)\nNo %s exists with ID \"%s\"", objectType, objectID);
 		return plainTextResponse(404, message);
 	}
 
@@ -152,7 +152,7 @@ public class ResourceUtil {
 	public static Response notAcceptable(List<Variant> variants)
 	{
 		StringBuilder sb = new StringBuilder(200);
-		sb.append("406 (NOT ACCEPTABLE)\nNone of the requested media types can be served.");
+		sb.append("406 (NOT ACCEPTABLE)\nNone of the requested media types can be served");
 		sb.append("\nAcceptable media types for this object: ");
 		if (variants == null || variants.size() == 0) {
 			sb.append(" none!");
@@ -175,7 +175,7 @@ public class ResourceUtil {
 	public static Response notAcceptableDebug(List<Variant> variants)
 	{
 		StringBuilder sb = new StringBuilder(200);
-		sb.append("406 (NOT ACCEPTABLE)\nNone of the requested media types can be served.");
+		sb.append("406 (NOT ACCEPTABLE)\nNone of the requested media types can be served");
 		sb.append("\nAcceptable media types for this object: ");
 		if (variants == null || variants.size() == 0) {
 			sb.append(" none!");
