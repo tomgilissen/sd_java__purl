@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import nl.naturalis.nda.domain.ObjectType;
+import nl.naturalis.nba.api.model.ObjectType;
 
 import org.domainobject.util.debug.BeanPrinter;
 

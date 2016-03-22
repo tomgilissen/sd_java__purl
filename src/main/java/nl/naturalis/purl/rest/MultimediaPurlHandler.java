@@ -16,9 +16,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import nl.naturalis.nda.domain.MultiMediaObject;
-import nl.naturalis.nda.domain.ObjectType;
-import nl.naturalis.nda.domain.ServiceAccessPoint;
+import nl.naturalis.nba.api.model.MultiMediaObject;
+import nl.naturalis.nba.api.model.ObjectType;
+import nl.naturalis.nba.api.model.ServiceAccessPoint;
 import nl.naturalis.purl.Registry;
 
 /**

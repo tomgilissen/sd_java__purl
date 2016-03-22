@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 
-import nl.naturalis.nda.domain.MultiMediaObject;
-import nl.naturalis.nda.domain.ServiceAccessPoint;
+import nl.naturalis.nba.api.model.MultiMediaObject;
+import nl.naturalis.nba.api.model.ServiceAccessPoint;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
