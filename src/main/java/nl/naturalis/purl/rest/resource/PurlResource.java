@@ -9,8 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.utils.StringUtil;
 import nl.naturalis.purl.rest.PurlHandler;
@@ -29,7 +29,7 @@ import nl.naturalis.purl.rest.SpecimenPurlHandler;
 public class PurlResource {
 
 	@SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory.getLogger(PurlResource.class);
+	private static final Logger logger = LogManager.getLogger(PurlResource.class);
 
 	@Context
 	private HttpServletRequest request;

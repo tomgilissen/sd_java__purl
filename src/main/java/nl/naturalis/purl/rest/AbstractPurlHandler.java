@@ -8,8 +8,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.client.ServerException;
 import nl.naturalis.nba.utils.ArrayUtil;
@@ -30,7 +30,7 @@ import nl.naturalis.nba.utils.StringUtil;
  */
 public abstract class AbstractPurlHandler implements PurlHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(AbstractPurlHandler.class);
+	private static final Logger logger = LogManager.getLogger(AbstractPurlHandler.class);
 
 	protected final HttpServletRequest request;
 	protected final UriInfo uriInfo;
@@ -56,7 +56,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	 */
 	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
 	{
-		logger.info("Creating " + getClass().getSimpleName() + " for " + uriInfo.getPath());
+		logger.info("Receiving request for " + uriInfo.getPath());
 		this.request = request;
 		this.uriInfo = uriInfo;
 		this.objectID = uriInfo.getPathParameters(true).getFirst("objectID");

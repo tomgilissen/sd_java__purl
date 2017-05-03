@@ -6,17 +6,18 @@ import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
 import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
-import static nl.naturalis.purl.rest.ResourceUtil.urlEncode;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.api.InvalidQueryException;
 import nl.naturalis.nba.api.QueryCondition;
@@ -27,8 +28,8 @@ import nl.naturalis.nba.api.model.MultiMediaObject;
 import nl.naturalis.nba.api.model.ServiceAccessPoint;
 import nl.naturalis.nba.api.model.Specimen;
 import nl.naturalis.nba.client.MultiMediaObjectClient;
-import nl.naturalis.nba.client.ServerException;
 import nl.naturalis.nba.client.SpecimenClient;
+import nl.naturalis.nba.utils.StringUtil;
 import nl.naturalis.purl.PurlException;
 import nl.naturalis.purl.Registry;
 
@@ -41,7 +42,7 @@ import nl.naturalis.purl.Registry;
  */
 public class SpecimenPurlHandler extends AbstractPurlHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(SpecimenPurlHandler.class);
+	private static final Logger logger = LogManager.getLogger(SpecimenPurlHandler.class);
 
 	private static final Specimen DUMMY_SPECIMEN = new Specimen();
 
@@ -61,6 +62,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	{
 
 		if (getSpecimen() == null) {
+			logger.info("Responding with 404 (Not Found) for unitID \"{}\"", objectID);
 			return notFound("Specimen", objectID);
 		}
 		ContentNegotiator negotiator = ContentNegotiatorFactory.getInstance().forSpecimens(accept);
@@ -72,48 +74,89 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 			mediaType = negotiator.negotiate();
 		}
 		if (mediaType == null) {
+			logger.info("Responding with 406 (Not Acceptable) for unitID \"{}\"", objectID);
 			if (debug) {
 				return notAcceptableDebug(negotiator.getAlternatives(getMultiMedia()));
 			}
 			return notAcceptable(negotiator.getAlternatives(getMultiMedia()));
 		}
+		URI location = getLocation(mediaType);
 		if (debug) {
-			return redirectDebug(getLocation(mediaType));
+			return redirectDebug(location);
 		}
-		return redirect(getLocation(mediaType));
+		return redirect(location);
 	}
 
-	private URI getLocation(MediaType mediaType) throws ServerException
+	private URI getLocation(MediaType mediaType) throws PurlException
 	{
 		if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
-			return getBioportalUri();
+			URI uri = getBioportalUri();
+			logger.info("Redirecting to Bioportal: {}", uri);
+			return uri;
 		}
 		if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-			return getNbaUri();
+			URI uri = getNbaUri();
+			logger.info("Redirecting to NBA: {}", uri);
+			return uri;
 		}
-		return getMedialibUri(mediaType);
+		URI uri = getMedialibUri(mediaType);
+		logger.info("Redirecting to Medialib: {}", uri);
+		return uri;
 	}
 
-	private URI getBioportalUri()
+	private URI getBioportalUri() throws PurlException
 	{
-		StringBuilder url = new StringBuilder(128);
-		url.append(Registry.getInstance().getBioportalBaseUrl());
-		url.append("/nba/result?nba_request=");
-		url.append(urlEncode("specimen/get-specimen/?unitID="));
-		url.append(urlEncode(objectID));
-		return URI.create(url.toString());
+		String baseUrl = Registry.getInstance().getBioportalBaseUrl();
+		URIBuilder ub;
+		try {
+			ub = new URIBuilder(baseUrl);
+		}
+		catch (URISyntaxException e) {
+			throw new PurlException("Invalid value for bioportal.baseurl (check purl.properties)");
+		}
+		String rootPath = ub.getPath();
+		StringBuilder fullPath = new StringBuilder(50);
+		if (rootPath != null) {
+			fullPath.append(StringUtil.rtrim(rootPath, '/'));
+		}
+		fullPath.append("/nba/result");
+		ub.setPath(fullPath.toString());
+		ub.addParameter("nba_request", "specimen/get-specimen/?unitID=" + objectID);
+		try {
+			return ub.build();
+		}
+		catch (URISyntaxException e) {
+			throw new PurlException(e);
+		}
 	}
 
-	private URI getNbaUri()
+	private URI getNbaUri() throws PurlException
 	{
-		StringBuilder url = new StringBuilder(128);
-		url.append(Registry.getInstance().getNbaBaseUrl());
-		url.append("/specimen/findByUnitID/");
-		url.append(urlEncode(objectID));
-		return URI.create(url.toString());
+		String baseUrl = Registry.getInstance().getNbaBaseUrl();
+		URIBuilder ub;
+		try {
+			ub = new URIBuilder(baseUrl);
+		}
+		catch (URISyntaxException e) {
+			throw new PurlException("Invalid value for nba.baseurl (check purl.properties)");
+		}
+		String rootPath = ub.getPath();
+		StringBuilder fullPath = new StringBuilder(50);
+		if (rootPath != null) {
+			fullPath.append(StringUtil.rtrim(rootPath, '/'));
+		}
+		fullPath.append("/specimen/findByUnitID/");
+		fullPath.append(objectID);
+		ub.setPath(fullPath.toString());
+		try {
+			return ub.build();
+		}
+		catch (URISyntaxException e) {
+			throw new PurlException(e);
+		}
 	}
 
-	private URI getMedialibUri(MediaType requested) throws ServerException
+	private URI getMedialibUri(MediaType requested)
 	{
 		MultiMediaObject[] multimedia = getMultiMedia();
 		if (multimedia != null) {

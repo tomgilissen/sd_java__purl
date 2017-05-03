@@ -7,8 +7,12 @@
         status="integration">
 	</info>
 	<dependencies>
-		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.12"/>
-		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.2"/>
+		<!-- dependency org="org.slf4j" name="slf4j-api" rev="1.7.12"/>		
+		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.2"/ -->
+		
+		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.7" />
+		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.7" />
+		
 		<dependency org="joda-time" name="joda-time" rev="2.7"/>
 		<dependency org="commons-io" name="commons-io" rev="2.4"/>
 		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.5.2"/>

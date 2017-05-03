@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.api.model.MultiMediaObject;
 import nl.naturalis.nba.api.model.ServiceAccessPoint;
@@ -29,7 +29,7 @@ import nl.naturalis.nba.api.model.ServiceAccessPoint;
  */
 public class ContentNegotiator {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContentNegotiator.class);
+	private static final Logger logger = LogManager.getLogger(ContentNegotiator.class);
 
 	/**
 	 * Retrieve Accept headers from the HTTP request and convert them to an
@@ -110,17 +110,21 @@ public class ContentNegotiator {
 	 */
 	public MediaType negotiate()
 	{
+		logger.info("Negotiating content type");
 		if (requestedMediaTypes.length == 0) {
 			// No Accept header in request
+			logger.info("No Accept header. Using default content type: " + generatedMediaTypes[0]);
 			return generatedMediaTypes[0];
 		}
 		for (MediaType requested : requestedMediaTypes) {
 			for (MediaType provided : generatedMediaTypes) {
 				if (requested.isCompatible(provided)) {
+					logger.info("Settled on " + provided);
 					return provided;
 				}
 			}
 		}
+		logger.info("Content negotiation failed");
 		return null;
 	}
 
@@ -139,21 +143,25 @@ public class ContentNegotiator {
 	public MediaType negotiate(MultiMediaObject[] multimedia)
 	{
 		if (requestedMediaTypes.length == 0) {
+			logger.info("No Accept header. Using default content type: " + generatedMediaTypes[0]);
 			return generatedMediaTypes[0];
 		}
 		Set<MediaType> repoMediaTypes = extractMediaTypes(multimedia);
 		for (MediaType requested : requestedMediaTypes) {
 			for (MediaType provided : generatedMediaTypes) {
 				if (requested.isCompatible(provided)) {
+					logger.info("Settled on " + provided);
 					return provided;
 				}
 			}
 			for (MediaType provided : repoMediaTypes) {
 				if (requested.isCompatible(provided)) {
+					logger.info("Settled on " + provided);
 					return provided;
 				}
 			}
 		}
+		logger.info("Content negotiation failed");
 		return null;
 	}
 
