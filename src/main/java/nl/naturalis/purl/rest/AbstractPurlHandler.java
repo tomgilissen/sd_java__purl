@@ -8,12 +8,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import nl.naturalis.nda.client.NBAResourceException;
-
-import org.domainobject.util.ArrayUtil;
-import org.domainobject.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.naturalis.nba.client.ServerException;
+import nl.naturalis.nba.utils.ArrayUtil;
+import nl.naturalis.nba.utils.StringUtil;
 
 /**
  * Abstract base class for classes capable of handling PURL requests. Implements
@@ -82,14 +82,16 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 			assert (response != null);
 			return response;
 		}
-		catch (NBAResourceException e) {
-			if (debug)
+		catch (ServerException e) {
+			if (debug) {
 				return serverErrorDebug(e.getServerInfoAsString());
+			}
 			return serverError(e.getServerInfoAsString());
 		}
 		catch (Throwable t) {
-			if (debug)
+			if (debug) {
 				return serverErrorDebug(getStackTrace(t));
+			}
 			return serverError(getStackTrace(t));
 		}
 	}
@@ -115,7 +117,8 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 		for (StackTraceElement e : t.getStackTrace()) {
 			sb.append("\nat ");
 			sb.append(e.getClassName()).append('.').append(e.getMethodName());
-			sb.append('(').append(e.getFileName()).append(':').append(e.getLineNumber()).append(')');
+			sb.append('(').append(e.getFileName()).append(':').append(e.getLineNumber())
+					.append(')');
 		}
 		return sb.toString();
 	}

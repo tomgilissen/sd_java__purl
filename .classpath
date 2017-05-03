@@ -4,10 +4,6 @@
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.domainobject.util"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.domainobject.util.http"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/nl.naturalis.nda.domain"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/nl.naturalis.nda.client"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
@@ -19,6 +15,10 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/WildFly 8.x Runtime"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/nl.naturalis.nba.api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/nl.naturalis.nba.client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/nl.naturalis.nba.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/nl.naturalis.nba.utils"/>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/WildFly 10.x Runtime"/>
 	<classpathentry kind="output" path="build/main"/>
 </classpath>

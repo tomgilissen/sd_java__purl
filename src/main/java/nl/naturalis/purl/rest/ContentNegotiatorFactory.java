@@ -5,9 +5,9 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import nl.naturalis.nba.utils.ConfigObject;
 import nl.naturalis.purl.Registry;
 
-import org.domainobject.util.ConfigObject;
 
 /**
  * A {@code ContentNegotiatorFactory} handles the configuration and creation of

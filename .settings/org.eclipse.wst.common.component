@@ -5,16 +5,16 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/resources"/>
-        <dependent-module archiveName="nl.naturalis.nda.domain.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nl.naturalis.nda.domain/nl.naturalis.nda.domain">
+        <dependent-module archiveName="nl.naturalis.nba.api.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nl.naturalis.nba.api/nl.naturalis.nba.api">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="nl.naturalis.nda.client.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nl.naturalis.nda.client/nl.naturalis.nda.client">
+        <dependent-module archiveName="nl.naturalis.nba.utils.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nl.naturalis.nba.utils/nl.naturalis.nba.utils">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="org.domainobject.util.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.domainobject.util/org.domainobject.util">
+        <dependent-module archiveName="nl.naturalis.nba.client.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nl.naturalis.nba.client/nl.naturalis.nba.client">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="org.domainobject.util.http.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.domainobject.util.http/org.domainobject.util.http">
+        <dependent-module archiveName="nl.naturalis.nba.common.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nl.naturalis.nba.common/nl.naturalis.nba.common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="nl.naturalis.purl"/>

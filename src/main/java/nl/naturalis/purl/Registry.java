@@ -3,15 +3,15 @@ package nl.naturalis.purl;
 import java.io.File;
 import java.io.IOException;
 
-import nl.naturalis.nda.client.ClientConfig;
-import nl.naturalis.nda.client.ClientFactory;
-import nl.naturalis.nda.client.MultiMediaClient;
-import nl.naturalis.nda.client.SpecimenClient;
-
-import org.domainobject.util.ConfigObject;
-import org.domainobject.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.naturalis.nba.client.ClientConfig;
+import nl.naturalis.nba.client.MultiMediaObjectClient;
+import nl.naturalis.nba.client.NbaSession;
+import nl.naturalis.nba.client.SpecimenClient;
+import nl.naturalis.nba.utils.ConfigObject;
+import nl.naturalis.nba.utils.FileUtil;
 
 /**
  * Class responsible for configuring and handing out various types of objects to
@@ -111,8 +111,11 @@ public class Registry {
 	 */
 	public SpecimenClient getSpecimenClient()
 	{
-		ClientConfig cfg = new ClientConfig(getNbaBaseUrl());
-		return ClientFactory.getInstance(cfg).createSpecimenClient();
+		ClientConfig config = new ClientConfig();
+		config.setBaseUrl(getNbaBaseUrl());
+		config.setPreferGET(true);
+		NbaSession session = new NbaSession(config);
+		return session.getSpecimenClient();
 	}
 
 
@@ -121,10 +124,13 @@ public class Registry {
 	 * 
 	 * @return
 	 */
-	public MultiMediaClient getMultiMediaClient()
+	public MultiMediaObjectClient getMultiMediaClient()
 	{
-		ClientConfig cfg = new ClientConfig(getNbaBaseUrl());
-		return ClientFactory.getInstance(cfg).createMultiMediaClient();
+		ClientConfig config = new ClientConfig();
+		config.setBaseUrl(getNbaBaseUrl());
+		config.setPreferGET(true);
+		NbaSession session = new NbaSession(config);
+		return session.getMultiMediaObjectClient();
 	}
 
 

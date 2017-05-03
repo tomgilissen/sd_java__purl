@@ -7,7 +7,7 @@
 # "nl.naturalis.purl.conf.dir". With Wildfly
 # system properties are best set in standalone.xml
 
-nba.baseurl=http://localhost:8080/v0
+nba.baseurl=http://localhost:8080/v2
 bioportal.baseurl=http://bioportal.naturalis.nl
 
 # Media type served when no Accept headers present

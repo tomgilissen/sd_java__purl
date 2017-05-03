@@ -11,9 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import nl.naturalis.nda.domain.ObjectType;
-
-import org.domainobject.util.debug.BeanPrinter;
+import nl.naturalis.nba.utils.debug.BeanPrinter;
 
 /**
  * Utility class providing useful REST-related functionality.
@@ -45,11 +43,9 @@ public class ResourceUtil {
 	 */
 	public static final MediaType JPEG_TYPE = MediaType.valueOf(JPEG);
 
-
 	private ResourceUtil()
 	{
 	}
-
 
 	/**
 	 * Equivalent to {@code URLEncoder.encode(s, "UTF-8")}.
@@ -69,7 +65,6 @@ public class ResourceUtil {
 		}
 	}
 
-
 	/**
 	 * Performs a 303 (See Other) redirect to the specified location
 	 * 
@@ -80,7 +75,6 @@ public class ResourceUtil {
 	{
 		return Response.seeOther(location).build();
 	}
-
 
 	/**
 	 * Shows the location to which the PURL server would redirect, but does not
@@ -95,7 +89,6 @@ public class ResourceUtil {
 		return plainTextResponse(message);
 	}
 
-
 	/**
 	 * Generate an HTTP response with status 500 (INTERNAL SERVER ERROR) and the
 	 * specified message in the response body. The content type of the response
@@ -109,7 +102,6 @@ public class ResourceUtil {
 		message = "500 (INTERNAL SERVER ERROR)\n" + message;
 		return plainTextResponse(500, message);
 	}
-
 
 	/**
 	 * Report a server error, but set the actual HTTP status to 200 (OK). By
@@ -126,7 +118,6 @@ public class ResourceUtil {
 		return plainTextResponse(message);
 	}
 
-
 	/**
 	 * Generate a 404 (NOT FOUND) response with the specified message in the
 	 * response body.
@@ -134,12 +125,12 @@ public class ResourceUtil {
 	 * @param message
 	 * @return
 	 */
-	public static Response notFound(ObjectType objectType, String objectID)
+	public static Response notFound(String objectType, String objectID)
 	{
-		String message = String.format("404 (NOT FOUND)\nNo %s exists with ID \"%s\"", objectType, objectID);
+		String message = String.format("404 (NOT FOUND)\nNo %s exists with ID \"%s\"", objectType,
+				objectID);
 		return plainTextResponse(404, message);
 	}
-
 
 	/**
 	 * Generate a 406 (NOT ACCEPTABLE) response with the specified list of
@@ -160,9 +151,9 @@ public class ResourceUtil {
 		else {
 			sb.append(getVariantsAsString(variants));
 		}
-		return Response.notAcceptable(variants).entity(sb.toString()).type(MediaType.TEXT_PLAIN).build();
+		return Response.notAcceptable(variants).entity(sb.toString()).type(MediaType.TEXT_PLAIN)
+				.build();
 	}
-
 
 	/**
 	 * Generate a debug variant of an HTTP 406 (NOT ACCEPTABLE) response. The
@@ -186,7 +177,6 @@ public class ResourceUtil {
 		return plainTextResponse(sb.toString());
 	}
 
-
 	/**
 	 * Generate a 200 (OK) response with the specified message in the response
 	 * body and a Content-Type header of text/plain.
@@ -198,7 +188,6 @@ public class ResourceUtil {
 	{
 		return Response.ok(message, MediaType.TEXT_PLAIN).build();
 	}
-
 
 	/**
 	 * Generate a response with the specified HTTP status code, the specified
@@ -213,7 +202,6 @@ public class ResourceUtil {
 		return Response.status(status).entity(message).type(MediaType.TEXT_PLAIN).build();
 	}
 
-
 	/**
 	 * Give a print-out of the specified object.
 	 * 
@@ -227,7 +215,6 @@ public class ResourceUtil {
 		bp.dump(bean);
 		return sw.toString();
 	}
-
 
 	private static String getVariantsAsString(List<Variant> variants)
 	{

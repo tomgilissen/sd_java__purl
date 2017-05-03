@@ -9,13 +9,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import nl.naturalis.nba.utils.StringUtil;
 import nl.naturalis.purl.rest.PurlHandler;
 import nl.naturalis.purl.rest.ResourceUtil;
 import nl.naturalis.purl.rest.SpecimenPurlHandler;
-
-import org.domainobject.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Central class of the PURL service. Provides endpoints for PURLs, but
@@ -70,6 +70,7 @@ public class PurlResource {
 	 */
 	@GET
 	@Path("/naturalis/multimedia/{objectID}")
+	@SuppressWarnings("static-method")
 	public Response handleNaturalisMultimediaPurl()
 	{
 		return ResourceUtil.serverError("Under construction");

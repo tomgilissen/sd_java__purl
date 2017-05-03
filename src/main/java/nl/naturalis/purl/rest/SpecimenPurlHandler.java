@@ -9,22 +9,28 @@ import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
 import static nl.naturalis.purl.rest.ResourceUtil.urlEncode;
 
 import java.net.URI;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import nl.naturalis.nda.client.NBAResourceException;
-import nl.naturalis.nda.client.SpecimenClient;
-import nl.naturalis.nda.domain.MultiMediaObject;
-import nl.naturalis.nda.domain.ObjectType;
-import nl.naturalis.nda.domain.ServiceAccessPoint;
-import nl.naturalis.purl.Registry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.naturalis.nba.api.InvalidQueryException;
+import nl.naturalis.nba.api.QueryCondition;
+import nl.naturalis.nba.api.QueryResult;
+import nl.naturalis.nba.api.QueryResultItem;
+import nl.naturalis.nba.api.QuerySpec;
+import nl.naturalis.nba.api.model.MultiMediaObject;
+import nl.naturalis.nba.api.model.ServiceAccessPoint;
+import nl.naturalis.nba.api.model.Specimen;
+import nl.naturalis.nba.client.MultiMediaObjectClient;
+import nl.naturalis.nba.client.ServerException;
+import nl.naturalis.nba.client.SpecimenClient;
+import nl.naturalis.purl.PurlException;
+import nl.naturalis.purl.Registry;
 
 /**
  * A {@link PurlHandler} capable of handling PURLs for specimen objects.
@@ -37,6 +43,9 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(SpecimenPurlHandler.class);
 
+	private static final Specimen DUMMY_SPECIMEN = new Specimen();
+
+	private Specimen specimen = DUMMY_SPECIMEN;
 	private MultiMediaObject[] multimedia;
 
 	public SpecimenPurlHandler(HttpServletRequest request, UriInfo uriInfo)
@@ -50,8 +59,9 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	@Override
 	protected Response doHandle() throws Exception
 	{
-		if (!Registry.getInstance().getSpecimenClient().exists(objectID)) {
-			return notFound(ObjectType.SPECIMEN, objectID);
+
+		if (getSpecimen() == null) {
+			return notFound("Specimen", objectID);
 		}
 		ContentNegotiator negotiator = ContentNegotiatorFactory.getInstance().forSpecimens(accept);
 		MediaType mediaType;
@@ -73,7 +83,7 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		return redirect(getLocation(mediaType));
 	}
 
-	private URI getLocation(MediaType mediaType) throws NBAResourceException
+	private URI getLocation(MediaType mediaType) throws ServerException
 	{
 		if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
 			return getBioportalUri();
@@ -98,23 +108,19 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 	{
 		StringBuilder url = new StringBuilder(128);
 		url.append(Registry.getInstance().getNbaBaseUrl());
-		url.append("/specimen/find/");
+		url.append("/specimen/findByUnitID/");
 		url.append(urlEncode(objectID));
 		return URI.create(url.toString());
 	}
 
-	private URI getMedialibUri(MediaType requested) throws NBAResourceException
+	private URI getMedialibUri(MediaType requested) throws ServerException
 	{
 		MultiMediaObject[] multimedia = getMultiMedia();
 		if (multimedia != null) {
-			Set<ServiceAccessPoint.Variant> variants;
 			for (MultiMediaObject mmo : multimedia) {
 				if (mmo.getServiceAccessPoints() != null) {
-					variants = mmo.getServiceAccessPoints().keySet();
-					for (ServiceAccessPoint.Variant variant : variants) {
-						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
-						// TODO: HACK. Media type not always set. Solve in
-						// import!
+					for (ServiceAccessPoint sap : mmo.getServiceAccessPoints()) {
+						// TODO: HACK. Media type not always set.
 						String format = sap.getFormat() == null ? JPEG : sap.getFormat();
 						MediaType available = MediaType.valueOf(format);
 						if (available.isCompatible(requested)) {
@@ -134,16 +140,50 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 		return null;
 	}
 
-	private MultiMediaObject[] getMultiMedia() throws NBAResourceException
+	private Specimen getSpecimen() throws PurlException
+	{
+		if (specimen == DUMMY_SPECIMEN) {
+			logger.info("Retrieving specimen with UnitID " + objectID);
+			SpecimenClient client = Registry.getInstance().getSpecimenClient();
+			Specimen[] specimens = client.findByUnitID(objectID);
+			if (specimens.length == 0) {
+				specimen = null;
+			}
+			else if (specimens.length > 1) {
+				throw new PurlException("Duplicate unitID: " + objectID);
+			}
+			else {
+				specimen = specimens[0];
+			}
+		}
+		return specimen;
+	}
+
+	private MultiMediaObject[] getMultiMedia()
 	{
 		if (multimedia == null) {
-			SpecimenClient client = Registry.getInstance().getSpecimenClient();
 			logger.info("Retrieving multimedia for specimen with UnitID " + objectID);
-			multimedia = client.getMultiMedia(objectID);
-			logger.info("Number of multimedia found: " + multimedia.length);
-			if (multimedia.length != 0 && logger.isDebugEnabled()) {
-				logger.debug(ResourceUtil.dump(multimedia));
+			MultiMediaObjectClient client = Registry.getInstance().getMultiMediaClient();
+			String field = "associatedSpecimenReference";
+			String value = specimen.getId();
+			QueryCondition qc = new QueryCondition(field, "=", value);
+			QuerySpec qs = new QuerySpec();
+			qs.setConstantScore(true);
+			qs.addCondition(qc);
+			QueryResult<MultiMediaObject> result;
+			try {
+				result = client.query(qs);
 			}
+			catch (InvalidQueryException e) {
+				assert (false);
+				return null;
+			}
+			multimedia = new MultiMediaObject[result.size()];
+			int i = 0;
+			for (QueryResultItem<MultiMediaObject> qri : result) {
+				multimedia[i++] = qri.getItem();
+			}
+			logger.info("Number of multimedia found: " + multimedia.length);
 		}
 		return multimedia;
 	}

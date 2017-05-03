@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 
-import nl.naturalis.nda.domain.MultiMediaObject;
-import nl.naturalis.nda.domain.ServiceAccessPoint;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.naturalis.nba.api.model.MultiMediaObject;
+import nl.naturalis.nba.api.model.ServiceAccessPoint;
 
 /**
  * A {@code ContentNegotiator} establishes the type of content to be served to
@@ -31,7 +31,6 @@ public class ContentNegotiator {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContentNegotiator.class);
 
-
 	/**
 	 * Retrieve Accept headers from the HTTP request and convert them to an
 	 * array of {@code MediaType} instances. Note that clients can supply
@@ -44,7 +43,6 @@ public class ContentNegotiator {
 	 * @param request
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static MediaType[] getRequestedMediaTypes(HttpServletRequest request)
 	{
 		String acceptParam = request.getParameter("__accept");
@@ -65,7 +63,8 @@ public class ContentNegotiator {
 						logger.warn("Invalid Accept header in request: \"" + one + "\" (ignored)");
 					}
 					else {
-						logger.warn("Invalid media type in Accept header: \"" + one + "\" (ignored)");
+						logger.warn(
+								"Invalid media type in Accept header: \"" + one + "\" (ignored)");
 					}
 				}
 			}
@@ -77,7 +76,6 @@ public class ContentNegotiator {
 	private MediaType[] generatedMediaTypes;
 	private MediaType[] repositoryMediaTypes;
 
-
 	/*
 	 * Package visibility. You must use a ContentNegotiatorFactory to get hold
 	 * of a ContentNegotiator.
@@ -87,24 +85,20 @@ public class ContentNegotiator {
 
 	}
 
-
 	void setAccept(MediaType[] accept)
 	{
 		this.requestedMediaTypes = accept;
 	}
-
 
 	void setGeneratedMediaTypes(MediaType[] basicMediaTypes)
 	{
 		this.generatedMediaTypes = basicMediaTypes;
 	}
 
-
 	void setRepositoryMediaTypes(MediaType[] repositoryMediaTypes)
 	{
 		this.repositoryMediaTypes = repositoryMediaTypes;
 	}
-
 
 	/**
 	 * Establish the media type to be served. This version of {@code negotiate}
@@ -129,7 +123,6 @@ public class ContentNegotiator {
 		}
 		return null;
 	}
-
 
 	/**
 	 * Establish the media type to be served. This version of {@code negotiate}
@@ -164,7 +157,6 @@ public class ContentNegotiator {
 		return null;
 	}
 
-
 	/**
 	 * Is there at least one Accept header in the PURL request that specifies a
 	 * media type that is served from the medialib or some other image
@@ -183,7 +175,6 @@ public class ContentNegotiator {
 		}
 		return false;
 	}
-
 
 	/**
 	 * Provide alternative media types if the client has requested a media type
@@ -206,7 +197,6 @@ public class ContentNegotiator {
 		return alternatives;
 	}
 
-
 	/*
 	 * Extract the serviceAccessPoints.format field from the specified
 	 * MultiMediaObject instances.
@@ -216,20 +206,15 @@ public class ContentNegotiator {
 		Set<MediaType> mediaTypes = new LinkedHashSet<>();
 		for (MultiMediaObject mmo : multimedia) {
 			if (mmo.getServiceAccessPoints() != null) {
-				Set<ServiceAccessPoint.Variant> variants = mmo.getServiceAccessPoints().keySet();
-				for (ServiceAccessPoint.Variant variant : variants) {
-					if (mmo.getServiceAccessPoints() != null) {
-						ServiceAccessPoint sap = mmo.getServiceAccessPoints().get(variant);
-						// TODO: HACK. Media type not always set. Solve in import!
-						String format = sap.getFormat() == null ? JPEG : sap.getFormat();
-						mediaTypes.add(MediaType.valueOf(format));
-					}
+				for (ServiceAccessPoint sap : mmo.getServiceAccessPoints()) {
+					// TODO: HACK. Media type not always set. Solve in import!
+					String format = sap.getFormat() == null ? JPEG : sap.getFormat();
+					mediaTypes.add(MediaType.valueOf(format));
 				}
 			}
 		}
 		return mediaTypes;
 	}
-
 
 	private static MediaType[] getRequestedMediaTypesDebug(String requestParam)
 	{
@@ -240,7 +225,8 @@ public class ContentNegotiator {
 				types.add(MediaType.valueOf(chunk));
 			}
 			catch (IllegalArgumentException e) {
-				logger.warn("Invalid media type in __accept parameter: \"" + chunk + "\" (ignored)");
+				logger.warn(
+						"Invalid media type in __accept parameter: \"" + chunk + "\" (ignored)");
 			}
 		}
 		return types.toArray(new MediaType[types.size()]);
