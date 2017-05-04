@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import nl.naturalis.nba.utils.debug.BeanPrinter;
+import nl.naturalis.nba.utils.http.SimpleHttpGet;
 
 /**
  * Utility class providing useful REST-related functionality.
@@ -74,6 +75,14 @@ public class ResourceUtil {
 	public static Response redirect(URI location)
 	{
 		return Response.seeOther(location).build();
+	}
+
+	public static Response load(URI location, MediaType mediaType)
+	{
+		SimpleHttpGet request = new SimpleHttpGet();
+		request.setBaseUrl(location);
+		byte[] source = request.execute().getResponseBody();
+		return Response.ok().entity(source).type(mediaType).build();
 	}
 
 	/**

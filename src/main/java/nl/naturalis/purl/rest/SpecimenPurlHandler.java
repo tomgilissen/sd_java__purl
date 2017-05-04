@@ -1,7 +1,7 @@
 package nl.naturalis.purl.rest;
 
 import static nl.naturalis.purl.rest.ResourceUtil.JPEG;
-import static nl.naturalis.purl.rest.ResourceUtil.notAcceptable;
+import static nl.naturalis.purl.rest.ResourceUtil.*;
 import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
@@ -81,6 +81,9 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
 			return notAcceptable(negotiator.getAlternatives(getMultiMedia()));
 		}
 		URI location = getLocation(mediaType);
+		if (Registry.getInstance().getConfig().isTrue("noredirect")) {
+			return load(location, mediaType);
+		}
 		if (debug) {
 			return redirectDebug(location);
 		}

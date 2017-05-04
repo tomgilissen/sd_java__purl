@@ -10,6 +10,8 @@
 nba.baseurl=http://localhost:8080/v2
 bioportal.baseurl=http://bioportal.naturalis.nl
 
+noredirect=true
+
 # Media type served when no Accept headers present
 specimen.purl.accept.default=text/html
 # Other media types we can serve. Do not include
