@@ -145,17 +145,6 @@ public class Registry {
 	}
 
 
-	/**
-	 * Get base url of the BioPortal, as defined in purl.properties.
-	 * 
-	 * @return
-	 */
-	public String getBioportalBaseUrl()
-	{
-		return config.required("bioportal.baseurl");
-	}
-
-
 	private void setConfDir()
 	{
 		String path = System.getProperty(SYSPROP_CONFIG_DIR);

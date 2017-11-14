@@ -8,8 +8,17 @@
 # system properties are best set in standalone.xml
 
 nba.baseurl=http://localhost:8080/v2
-bioportal.baseurl=http://bioportal.naturalis.nl
 
+# Template for the Bioportal's specimen detail page.
+# You can use ${unitID} placeholder for the actual
+# unitID.
+bioportal.specimen.url=http://bioportal.naturalis.nl/specimen/${unitID}
+
+# If set to true, PURLs will not be redirected
+# using the HTTP 303 redirect mechanism. In
+# browsers this has the effect that the PURL will
+# stay in the address bar; it will not be replaced
+# by the bioportal/NBA/medialib URL.
 noredirect=true
 
 # Media type served when no Accept headers present
