@@ -6,11 +6,14 @@ import static nl.naturalis.purl.rest.ResourceUtil.notAcceptableDebug;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
 import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -103,10 +106,19 @@ public class SpecimenPurlHandler extends AbstractPurlHandler {
   private URI getBioportalUri() throws PurlException {
     ConfigObject cfg = Registry.getInstance().getConfig();
     String uriTemplate = cfg.required("bioportal.specimen.url");
-    uriTemplate = uriTemplate.replace("${unitID}", objectID);
+    int x = uriTemplate.indexOf("${unitID}");
+    if (x == -1) {
+      throw new PurlException("Missing placeholder \"${unitID}\" in Bioportal URL template (check configuration)");
+    }
+    int y = uriTemplate.indexOf('?');
     try {
-      return new URI(uriTemplate);
-    } catch (URISyntaxException e) {
+      if (y == -1 || y > x) {
+        String objectIDEncoded = UriBuilder.fromPath(objectID).build().toString();
+        return new URI(uriTemplate.replace("${unitID}", objectIDEncoded));
+      }
+      String objectIDEncoded = URLEncoder.encode(objectID, "UTF-8");
+      return new URI(uriTemplate.replace("${unitID}", objectIDEncoded));
+    } catch (UnsupportedEncodingException | URISyntaxException e) {
       throw new PurlException(e);
     }
   }

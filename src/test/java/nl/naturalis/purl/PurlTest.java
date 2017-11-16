@@ -1,17 +1,18 @@
 package nl.naturalis.purl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import javax.ws.rs.core.UriBuilder;
 import nl.naturalis.nba.utils.http.SimpleHttpGet;
 
 public class PurlTest {
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws UnsupportedEncodingException
 	{
-		SimpleHttpGet request = new SimpleHttpGet();
-		request.setBaseUrl("http://localhost:8080/purl");
-		request.setPath("naturalis/specimen/ZMA.MAM.1419");
-		request.setAccept("application/json");
-		request.execute();
-		System.out.println(new String(request.getResponseBody()));
+    System.out.println(UriBuilder.fromPath("ay  & co").toString());
+    System.out.println(URLEncoder.encode("ay  & co", "UTF-8"));
+    
+		
 	}
 
 }
