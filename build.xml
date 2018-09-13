@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:if="ant:if" xmlns:unless="ant:unless" basedir="." name="nl.naturalis.purl">
-
-	<target name="collect-dependencies">
-		<ivy:retrieve pattern="WebContent/WEB-INF/lib/[artifact]-[revision](-[classifier]).[ext]" log="download-only" />
-	</target>
-	
-		
-</project>

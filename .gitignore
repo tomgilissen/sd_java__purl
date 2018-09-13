@@ -2,3 +2,7 @@
 /build.properties
 /.tern-project
 /target/
+/.classpath
+/.settings/
+/.project
+
