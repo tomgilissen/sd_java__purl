@@ -63,12 +63,12 @@ public class NaturalisPurlHandler extends AbstractPurlHandler {
 		Specimen specimen = getSpecimen();
 		if (specimen == null) {
 			logger.info("Responding with 404 (Not Found) for unitID \"{}\"", objectID);
-			return notFound("Specimen", objectID);
+			return notFound("specimen", objectID);
 		}
 		if (!sourceSystemOK(specimen)) {
 			logger.info("Responding with 404 (Not Found) for unitID \"{}\" (belongs to another source system: \"{}\")",
 					objectID, specimen.getSourceSystem().getCode());
-			return notFound("Specimen", objectID);
+			return notFound("specimen", objectID);
 		}
 		for (MediaType mediaType : getRequestedMediaTypes(request)) {
 			URI location = getLocation(mediaType, specimen);

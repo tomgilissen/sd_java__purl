@@ -62,12 +62,12 @@ public class XenoCantoPurlHandler extends AbstractPurlHandler {
 		Specimen specimen = getSpecimen();
 		if (specimen == null) {
 			logger.info("Responding with 404 (Not Found) for unitID \"{}\"", objectID);
-			return notFound("Specimen", objectID);
+			return notFound("observation", objectID);
 		}
 		if (!sourceSystemOK(specimen)) {
 			logger.info("Responding with 404 (Not Found) for unitID \"{}\" (belongs to another source system: \"{}\")",
 					objectID, specimen.getSourceSystem().getCode());
-			return notFound("Specimen", objectID);
+			return notFound("observation", objectID);
 		}
 		for (MediaType mediaType : getRequestedMediaTypes(request)) {
 			URI location = getLocation(mediaType, specimen);
@@ -156,10 +156,10 @@ public class XenoCantoPurlHandler extends AbstractPurlHandler {
 		} catch (InvalidQueryException e) {
 			throw new PurlException(e);
 		}
-		if(result.size() ==0) {
+		if (result.size() == 0) {
 			return null;
 		}
-		if (result.size()> 1) {
+		if (result.size() > 1) {
 			throw new PurlException("Duplicate sourceSystemId: " + objectID);
 		}
 		return result.get(0).getItem();
