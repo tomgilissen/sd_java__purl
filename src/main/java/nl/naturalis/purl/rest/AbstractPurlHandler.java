@@ -34,6 +34,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 
 	protected final HttpServletRequest request;
 	protected final UriInfo uriInfo;
+	
 	/**
 	 * The local scope identifier extracted from the PURL.
 	 */
@@ -54,13 +55,13 @@ public abstract class AbstractPurlHandler implements PurlHandler {
 	 * @param request
 	 * @param uriInfo
 	 */
-	public AbstractPurlHandler(HttpServletRequest request, UriInfo uriInfo)
+	public AbstractPurlHandler(String objectID, HttpServletRequest request, UriInfo uriInfo)
 	{
 		logger.info("Receiving request for " + uriInfo.getPath());
+		this.objectID = objectID;
 		this.request = request;
 		this.uriInfo = uriInfo;
-		this.objectID = uriInfo.getPathParameters(true).getFirst("objectID");
-		this.accept = ContentNegotiator.getRequestedMediaTypes(request);
+		this.accept = ContentNegotiatorUtil.getRequestedMediaTypes(request);
 		logger.info("Accepted media types: " + ArrayUtil.implode(accept));
 		if (uriInfo.getQueryParameters().containsKey("__debug")) {
 			String val = uriInfo.getQueryParameters().getFirst("__debug");

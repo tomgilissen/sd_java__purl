@@ -18,31 +18,8 @@ import nl.naturalis.nba.utils.http.SimpleHttpGet;
  * Utility class providing useful REST-related functionality.
  * 
  * @author Ayco Holleman
- * @created Jul 22, 2015
- *
  */
 public class ResourceUtil {
-
-	/**
-	 * Defined as {@code application/json;charset=UTF-8}. When sending a JSON
-	 * response back to the client, use this media type in stead of the prefab
-	 * MediaType.APPLICATION_JSON. We seem to have reports that without the
-	 * charset parameter, some browsers or browser versions don't interpret the
-	 * response as expected.
-	 */
-	public static final String JSON = "application/json;charset=UTF-8";
-	/**
-	 * The {@link MediaType} corresponding to {@code JSON}.
-	 */
-	public static final MediaType JSON_TYPE = MediaType.valueOf(JSON);
-	/**
-	 * Defined as {@code image/jpeg}.
-	 */
-	public static final String JPEG = "image/jpeg";
-	/**
-	 * The {@link MediaType} corresponding to {@code JPEG}.
-	 */
-	public static final MediaType JPEG_TYPE = MediaType.valueOf(JPEG);
 
 	private ResourceUtil()
 	{
