@@ -144,16 +144,25 @@ public class XenoCantoPurlHandler extends AbstractPurlHandler {
 	}
 
 	private Specimen getSpecimen() throws PurlException {
-		logger.info("Retrieving specimen with UnitID " + objectID);
+		logger.info("Retrieving observation with source system ID " + objectID);
 		SpecimenClient client = Registry.getInstance().getSpecimenClient();
-		Specimen[] specimens = client.findByUnitID(objectID);
-		if (specimens.length == 0) {
+		QuerySpec query = new QuerySpec();
+		query.setConstantScore(true);
+		query.addCondition(new QueryCondition("sourceSystemId", "=", objectID));
+		query.addCondition(new QueryCondition("sourceSystem.code", "=", "XC"));
+		QueryResult<Specimen> result;
+		try {
+			result = client.query(query);
+		} catch (InvalidQueryException e) {
+			throw new PurlException(e);
+		}
+		if(result.size() ==0) {
 			return null;
 		}
-		if (specimens.length > 1) {
-			throw new PurlException("Duplicate unitID: " + objectID);
+		if (result.size()> 1) {
+			throw new PurlException("Duplicate sourceSystemId: " + objectID);
 		}
-		return specimens[0];
+		return result.get(0).getItem();
 	}
 
 	@SuppressWarnings("unused")
