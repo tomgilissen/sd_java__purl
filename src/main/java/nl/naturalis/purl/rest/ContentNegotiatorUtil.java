@@ -14,9 +14,17 @@ import javax.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import nl.naturalis.nba.api.InvalidQueryException;
+import nl.naturalis.nba.api.QueryCondition;
+import nl.naturalis.nba.api.QueryResult;
+import nl.naturalis.nba.api.QueryResultItem;
+import nl.naturalis.nba.api.QuerySpec;
 import nl.naturalis.nba.api.model.MultiMediaObject;
 import nl.naturalis.nba.api.model.ServiceAccessPoint;
 import nl.naturalis.nba.api.model.Specimen;
+import nl.naturalis.nba.client.MultiMediaObjectClient;
+import nl.naturalis.purl.PurlException;
+import nl.naturalis.purl.Registry;
 
 /**
  * A {@code ContentNegotiator} establishes the type of content to be served to
@@ -44,6 +52,33 @@ class ContentNegotiatorUtil {
 
 	private static final Logger logger = LogManager.getLogger(ContentNegotiatorUtil.class);
 	private static final String JPEG = "image/jpeg";
+
+	/**
+	 * Get multimedia for specified specimen.
+	 */
+	static MultiMediaObject[] getMultiMedia(Specimen specimen) throws PurlException {
+		logger.info("Retrieving multimedia for specimen with UnitID " + specimen.getUnitID());
+		MultiMediaObjectClient client = Registry.getInstance().getMultiMediaClient();
+		String field = "associatedSpecimenReference";
+		String value = specimen.getId();
+		QueryCondition condition = new QueryCondition(field, "=", value);
+		QuerySpec query = new QuerySpec();
+		query.setConstantScore(true);
+		query.addCondition(condition);
+		QueryResult<MultiMediaObject> result;
+		try {
+			result = client.query(query);
+		} catch (InvalidQueryException e) {
+			throw new PurlException(e);
+		}
+		MultiMediaObject[] multimedia = new MultiMediaObject[result.size()];
+		int i = 0;
+		for (QueryResultItem<MultiMediaObject> qri : result) {
+			multimedia[i++] = qri.getItem();
+		}
+		logger.info("Number of multimedia found: " + multimedia.length);
+		return multimedia;
+	}
 
 	/**
 	 * Retrieve Accept headers from the HTTP request and convert them to an array of

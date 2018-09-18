@@ -11,7 +11,6 @@ import static nl.naturalis.purl.rest.ResourceUtil.redirect;
 import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -23,21 +22,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import nl.naturalis.nba.api.InvalidQueryException;
-import nl.naturalis.nba.api.QueryCondition;
-import nl.naturalis.nba.api.QueryResult;
-import nl.naturalis.nba.api.QueryResultItem;
-import nl.naturalis.nba.api.QuerySpec;
-import nl.naturalis.nba.api.model.MultiMediaObject;
 import nl.naturalis.nba.api.model.Specimen;
-import nl.naturalis.nba.client.MultiMediaObjectClient;
-import nl.naturalis.nba.client.SpecimenClient;
 import nl.naturalis.nba.utils.ConfigObject;
-import nl.naturalis.nba.utils.StringUtil;
 import nl.naturalis.purl.PurlException;
 import nl.naturalis.purl.Registry;
 
@@ -46,7 +35,7 @@ import nl.naturalis.purl.Registry;
  * 
  * @author Ayco Holleman
  */
-public class XenoCantoPurlHandler extends AbstractPurlHandler {
+public class XenoCantoPurlHandler extends AbstractSpecimenPurlHandler {
 
 	private static final Logger logger = LogManager.getLogger(XenoCantoPurlHandler.class);
 
@@ -54,9 +43,6 @@ public class XenoCantoPurlHandler extends AbstractPurlHandler {
 		super(objectID, request, uriInfo);
 	}
 
-	/**
-	 * @see AbstractPurlHandler#doHandle()
-	 */
 	@Override
 	protected Response doHandle() throws Exception {
 		Specimen specimen = getSpecimen();
@@ -91,7 +77,7 @@ public class XenoCantoPurlHandler extends AbstractPurlHandler {
 		return notAcceptable(variants);
 	}
 
-	protected boolean sourceSystemOK(Specimen specimen) {
+	private static boolean sourceSystemOK(Specimen specimen) {
 		return specimen.getSourceSystem() == XC;
 	}
 
@@ -113,81 +99,7 @@ public class XenoCantoPurlHandler extends AbstractPurlHandler {
 			throw new PurlException(
 					"Missing placeholder \"${sourceSystemId}\" in Xeno-canto URL template (check purl.properties)");
 		}
-		try {
-			return new URI(uriTemplate.replace("${sourceSystemId}", specimen.getSourceSystemId()));
-		} catch (URISyntaxException e) {
-			throw new PurlException(e);
-		}
-	}
-
-	private URI getNbaUri() throws PurlException {
-		String baseUrl = Registry.getInstance().getNbaBaseUrl();
-		URIBuilder ub;
-		try {
-			ub = new URIBuilder(baseUrl);
-		} catch (URISyntaxException e) {
-			throw new PurlException("Invalid value for nba.baseurl (check purl.properties)");
-		}
-		String rootPath = ub.getPath();
-		StringBuilder fullPath = new StringBuilder(50);
-		if (rootPath != null) {
-			fullPath.append(StringUtil.rtrim(rootPath, '/'));
-		}
-		fullPath.append("/specimen/findByUnitID/");
-		fullPath.append(objectID);
-		ub.setPath(fullPath.toString());
-		try {
-			return ub.build();
-		} catch (URISyntaxException e) {
-			throw new PurlException(e);
-		}
-	}
-
-	private Specimen getSpecimen() throws PurlException {
-		logger.info("Retrieving observation with source system ID " + objectID);
-		SpecimenClient client = Registry.getInstance().getSpecimenClient();
-		QuerySpec query = new QuerySpec();
-		query.setConstantScore(true);
-		query.addCondition(new QueryCondition("sourceSystemId", "=", objectID));
-		query.addCondition(new QueryCondition("sourceSystem.code", "=", "XC"));
-		QueryResult<Specimen> result;
-		try {
-			result = client.query(query);
-		} catch (InvalidQueryException e) {
-			throw new PurlException(e);
-		}
-		if (result.size() == 0) {
-			return null;
-		}
-		if (result.size() > 1) {
-			throw new PurlException("Duplicate sourceSystemId: " + objectID);
-		}
-		return result.get(0).getItem();
-	}
-
-	@SuppressWarnings("unused")
-	private MultiMediaObject[] getMultiMedia(Specimen specimen) throws PurlException {
-		logger.info("Retrieving multimedia for specimen with UnitID " + objectID);
-		MultiMediaObjectClient client = Registry.getInstance().getMultiMediaClient();
-		String field = "associatedSpecimenReference";
-		String value = specimen.getId();
-		QueryCondition condition = new QueryCondition(field, "=", value);
-		QuerySpec query = new QuerySpec();
-		query.setConstantScore(true);
-		query.addCondition(condition);
-		QueryResult<MultiMediaObject> result;
-		try {
-			result = client.query(query);
-		} catch (InvalidQueryException e) {
-			throw new PurlException(e);
-		}
-		MultiMediaObject[] multimedia = new MultiMediaObject[result.size()];
-		int i = 0;
-		for (QueryResultItem<MultiMediaObject> qri : result) {
-			multimedia[i++] = qri.getItem();
-		}
-		logger.info("Number of multimedia found: " + multimedia.length);
-		return multimedia;
+		return URI.create(uriTemplate.replace("${sourceSystemId}", specimen.getSourceSystemId()));
 	}
 
 }

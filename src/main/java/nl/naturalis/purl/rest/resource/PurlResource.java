@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import nl.naturalis.nba.utils.StringUtil;
 import nl.naturalis.purl.rest.NaturalisPurlHandler;
 import nl.naturalis.purl.rest.PurlHandler;
+import nl.naturalis.purl.rest.WaarnemingPurlHandler;
 import nl.naturalis.purl.rest.XenoCantoPurlHandler;
 
 /**
@@ -70,6 +71,18 @@ public class PurlResource {
 	@Path("/xeno-canto/observation/{objectID}")
 	public Response handleXenoCantoSpecimenPurl(@PathParam("objectID") String objectID) {
 		XenoCantoPurlHandler handler = new XenoCantoPurlHandler(objectID, request, uriInfo);
+		return handler.handlePurl();
+	}
+
+	/**
+	 * Endpoint for Waarneming observation PURLs.
+	 * 
+	 * @return
+	 */
+	@GET
+	@Path("/obsint/observation/{objectID}")
+	public Response handleWaarnemingSpecimenPurl(@PathParam("objectID") String objectID) {
+		WaarnemingPurlHandler handler = new WaarnemingPurlHandler(objectID, request, uriInfo);
 		return handler.handlePurl();
 	}
 

@@ -24,7 +24,6 @@ import nl.naturalis.nba.utils.StringUtil;
  * but just throw them out of the {@code doHandle()} method.
  * 
  * @author Ayco Holleman
- * @created Jul 9, 2015
  * 
  *
  */
