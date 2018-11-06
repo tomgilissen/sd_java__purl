@@ -97,7 +97,7 @@ public class NaturalisPurlHandler extends AbstractSpecimenPurlHandler {
 	private URI getBioportalUri() throws PurlException {
 		ConfigObject cfg = Registry.getInstance().getConfig();
 		String uriTemplate = cfg.required("bioportal.specimen.url");
-		if (uriTemplate.contains("${unitID}")) {
+		if (!uriTemplate.contains("${unitID}")) {
 			throw new PurlException(
 					"Missing placeholder \"${unitID}\" in Bioportal URL template (check purl.properties)");
 		}

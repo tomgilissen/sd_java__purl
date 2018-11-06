@@ -1,6 +1,6 @@
 package nl.naturalis.purl.rest;
 
-import static nl.naturalis.nba.api.model.SourceSystem.WRNNL;
+import static nl.naturalis.nba.api.model.SourceSystem.*;
 import static nl.naturalis.purl.rest.ContentNegotiatorUtil.findUriForMediaType;
 import static nl.naturalis.purl.rest.ContentNegotiatorUtil.getAvailableMultiMediaTypes;
 import static nl.naturalis.purl.rest.ContentNegotiatorUtil.getMultiMedia;
@@ -81,7 +81,7 @@ public class WaarnemingPurlHandler extends AbstractSpecimenPurlHandler {
 	}
 
 	private static boolean sourceSystemOK(Specimen specimen) {
-		return specimen.getSourceSystem() == WRNNL;
+		return specimen.getSourceSystem() == OBS;
 	}
 
 	private URI getLocation(MediaType mediaType, Specimen specimen, MultiMediaObject[] multimedia)

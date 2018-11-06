@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.utils.StringUtil;
+import nl.naturalis.purl.Registry;
 import nl.naturalis.purl.rest.NaturalisPurlHandler;
 import nl.naturalis.purl.rest.PurlHandler;
 import nl.naturalis.purl.rest.WaarnemingPurlHandler;
@@ -47,6 +48,13 @@ public class PurlResource {
 	@Produces(MediaType.TEXT_HTML)
 	public String welcome() {
 		String html = StringUtil.fromInputStream(getClass().getResourceAsStream("welcome.html"));
+		String myBaseUrl = Registry.getInstance().getConfig().get("purl.baseurl");
+		if (myBaseUrl == null) {
+			myBaseUrl = "http://data.biodiversitydata.nl";
+		} else {
+			myBaseUrl = StringUtil.rtrim(myBaseUrl, '/');
+		}
+		html = html.replaceAll("@baseurl@", myBaseUrl);
 		return html;
 	}
 
