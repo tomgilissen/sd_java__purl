@@ -1,4 +1,4 @@
-package nl.naturalis.purl.rest.resource;
+package nl.naturalis.purl.rest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -15,10 +15,9 @@ import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.utils.StringUtil;
 import nl.naturalis.purl.Registry;
-import nl.naturalis.purl.rest.NaturalisPurlHandler;
-import nl.naturalis.purl.rest.PurlHandler;
-import nl.naturalis.purl.rest.WaarnemingPurlHandler;
-import nl.naturalis.purl.rest.XenoCantoPurlHandler;
+import nl.naturalis.purl.naturalis.NaturalisPurlHandler;
+import nl.naturalis.purl.waarneming.WaarnemingPurlHandler;
+import nl.naturalis.purl.xenocanto.XenoCantoPurlHandler;
 
 /**
  * Central class of the PURL service. Provides endpoints for PURLs, but

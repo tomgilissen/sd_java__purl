@@ -1,4 +1,4 @@
-package nl.naturalis.purl.rest.resource;
+package nl.naturalis.purl.rest;
 
 import java.util.Properties;
 

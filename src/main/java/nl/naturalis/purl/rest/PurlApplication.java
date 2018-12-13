@@ -14,9 +14,9 @@ import nl.naturalis.purl.Registry;
 @ApplicationPath("/")
 public class PurlApplication extends Application {
 
-	public PurlApplication()
-	{
-		super();
-		Registry.initialize();
-	}
+  public PurlApplication() {
+    super();
+    Registry.initialize();
+  }
+
 }

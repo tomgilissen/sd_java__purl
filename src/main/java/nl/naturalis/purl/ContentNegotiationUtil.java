@@ -1,4 +1,4 @@
-package nl.naturalis.purl.rest;
+package nl.naturalis.purl;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -14,17 +14,9 @@ import javax.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import nl.naturalis.nba.api.InvalidQueryException;
-import nl.naturalis.nba.api.QueryCondition;
-import nl.naturalis.nba.api.QueryResult;
-import nl.naturalis.nba.api.QueryResultItem;
-import nl.naturalis.nba.api.QuerySpec;
 import nl.naturalis.nba.api.model.MultiMediaObject;
 import nl.naturalis.nba.api.model.ServiceAccessPoint;
 import nl.naturalis.nba.api.model.Specimen;
-import nl.naturalis.nba.client.MultiMediaObjectClient;
-import nl.naturalis.purl.PurlException;
-import nl.naturalis.purl.Registry;
 
 /**
  * A {@code ContentNegotiator} establishes the type of content to be served to the client by comparing Accept headers with the actually
@@ -33,50 +25,22 @@ import nl.naturalis.purl.Registry;
  * @author Ayco Holleman
  *
  */
-class ContentNegotiatorUtil {
-  
-  public static MediaType RDF_MEDIA_TYPE = MediaType.valueOf("application/rdf+xml");
+public class ContentNegotiationUtil {
 
   /**
    * Defined as {@code application/json;charset=UTF-8}. When sending a JSON response back to the client, use this media type in stead of the
    * prefab MediaType.APPLICATION_JSON. We seem to have reports that without the charset parameter, some browsers or browser versions don't
    * interpret the response as expected.
    */
-  private static final String JSON_MEDIA_TYPE_STRING = "application/json;charset=UTF-8";
-  /**
-   * The {@link MediaType} corresponding to {@code JSON}.
-   */
-  static final MediaType JSON_MEDIA_TYPE = MediaType.valueOf(JSON_MEDIA_TYPE_STRING);
+  public static final MediaType JSON_MEDIA_TYPE = MediaType.valueOf("application/json;charset=UTF-8");
 
-  private static final Logger logger = LogManager.getLogger(ContentNegotiatorUtil.class);
+  /**
+   * Defined as {@code application/rdf+xml}.
+   */
+  public static MediaType RDF_MEDIA_TYPE = MediaType.valueOf("application/rdf+xml");
+
+  private static final Logger logger = LogManager.getLogger(ContentNegotiationUtil.class);
   private static final String JPEG = "image/jpeg";
-
-  /**
-   * Get multimedia for specified specimen.
-   */
-  static MultiMediaObject[] getMultiMedia(Specimen specimen) throws PurlException {
-    logger.info("Retrieving multimedia for specimen with UnitID " + specimen.getUnitID());
-    MultiMediaObjectClient client = Registry.getInstance().getMultiMediaClient();
-    String field = "associatedSpecimenReference";
-    String value = specimen.getId();
-    QueryCondition condition = new QueryCondition(field, "=", value);
-    QuerySpec query = new QuerySpec();
-    query.setConstantScore(true);
-    query.addCondition(condition);
-    QueryResult<MultiMediaObject> result;
-    try {
-      result = client.query(query);
-    } catch (InvalidQueryException e) {
-      throw new PurlException(e);
-    }
-    MultiMediaObject[] multimedia = new MultiMediaObject[result.size()];
-    int i = 0;
-    for (QueryResultItem<MultiMediaObject> qri : result) {
-      multimedia[i++] = qri.getItem();
-    }
-    logger.info("Number of multimedia found: " + multimedia.length);
-    return multimedia;
-  }
 
   /**
    * Retrieve Accept headers from the HTTP request and convert them to an array of {@code MediaType} instances. Note that clients can supply
@@ -87,7 +51,7 @@ class ContentNegotiatorUtil {
    * @param request
    * @return
    */
-  static MediaType[] getRequestedMediaTypes(HttpServletRequest request) {
+  public static List<MediaType> getRequestedMediaTypes(HttpServletRequest request) {
     String acceptParam = request.getParameter("__accept");
     if (acceptParam != null) {
       return getRequestedMediaTypesDebug(acceptParam);
@@ -109,18 +73,18 @@ class ContentNegotiatorUtil {
         }
       }
     }
-    return types.toArray(new MediaType[types.size()]);
+    return types;
   }
 
   /**
-   * Extract the media types from the specified MultiMediaObject instances.
+   * Get the available multimedia media types from the provided MultiMediaObject documents.
    */
-  static Set<MediaType> getAvailableMultiMediaTypes(MultiMediaObject[] multimedia) {
+  public static Set<MediaType> getAvailableMultiMediaTypes(MultiMediaObject[] multimedia) {
     Set<MediaType> mediaTypes = new LinkedHashSet<>();
     for (MultiMediaObject mmo : multimedia) {
       if (mmo.getServiceAccessPoints() != null) {
         for (ServiceAccessPoint sap : mmo.getServiceAccessPoints()) {
-          // TODO: HACK. Media type not always set. Solve in import!
+          // HACK. Media type not always set. Solve in import!
           String format = sap.getFormat() == null ? JPEG : sap.getFormat();
           mediaTypes.add(MediaType.valueOf(format));
         }
@@ -129,11 +93,14 @@ class ContentNegotiatorUtil {
     return mediaTypes;
   }
 
-  static Set<MediaType> getAvailableMultiMediaTypes(Specimen specimen) {
+  /**
+   * Get the available multimedia media types from the provided Specimen document.
+   */
+  public static Set<MediaType> getAvailableMultiMediaTypes(Specimen specimen) {
     Set<MediaType> mediaTypes = new LinkedHashSet<>();
     if (specimen.getAssociatedMultiMediaUris() != null) {
       for (ServiceAccessPoint sap : specimen.getAssociatedMultiMediaUris()) {
-        // TODO: HACK. Media type not always set. Solve in import!
+        // HACK. Media type not always set. Solve in import!
         String format = sap.getFormat() == null ? JPEG : sap.getFormat();
         mediaTypes.add(MediaType.valueOf(format));
       }
@@ -142,9 +109,9 @@ class ContentNegotiatorUtil {
   }
 
   /**
-   * Get URI of multimedia object that matches the specified media type.
+   * Searches the provided multimedia documents for a multimedia URI that matches the provided media type.
    */
-  static Optional<URI> findUriForMediaType(MediaType requested, MultiMediaObject[] multimedia) {
+  public static Optional<URI> findUriForMediaType(MediaType requested, MultiMediaObject[] multimedia) {
     for (MultiMediaObject mmo : multimedia) {
       if (mmo.getServiceAccessPoints() != null) {
         for (ServiceAccessPoint sap : mmo.getServiceAccessPoints()) {
@@ -159,7 +126,14 @@ class ContentNegotiatorUtil {
     return Optional.empty();
   }
 
-  static Optional<URI> findUriForMediaType(MediaType requested, Specimen specimen) {
+  /**
+   * Searches the provided specimen document for a multimedia URI that matches the provided media type.
+   * 
+   * @param requested
+   * @param specimen
+   * @return
+   */
+  public static Optional<URI> findUriForMediaType(MediaType requested, Specimen specimen) {
     if (specimen.getAssociatedMultiMediaUris() != null) {
       for (ServiceAccessPoint sap : specimen.getAssociatedMultiMediaUris()) {
         String format = sap.getFormat() == null ? JPEG : sap.getFormat();
@@ -172,7 +146,7 @@ class ContentNegotiatorUtil {
     return Optional.empty();
   }
 
-  private static MediaType[] getRequestedMediaTypesDebug(String requestParam) {
+  private static List<MediaType> getRequestedMediaTypesDebug(String requestParam) {
     String[] chunks = requestParam.split(",");
     List<MediaType> types = new ArrayList<>(chunks.length);
     for (String chunk : chunks) {
@@ -182,7 +156,7 @@ class ContentNegotiatorUtil {
         logger.warn("Invalid media type in __accept parameter: \"" + chunk + "\" (ignored)");
       }
     }
-    return types.toArray(new MediaType[types.size()]);
+    return types;
   }
 
 }
