@@ -1,7 +1,5 @@
 package nl.naturalis.purl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -11,7 +9,6 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
@@ -21,14 +18,15 @@ import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.api.model.Specimen;
 import nl.naturalis.nba.utils.StringUtil;
-import nl.naturalis.purl.rdf.RdfWriter;
+import nl.naturalis.purl.rdf.RdfResponseProvider;
 
-import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_XML;
+import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_JSONLD;
+import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_TURTLE;
+import static nl.naturalis.purl.ContentNegotiationUtil.*;
 import static nl.naturalis.purl.ContentNegotiationUtil.getAvailableMultiMediaTypes;
 import static nl.naturalis.purl.ContentNegotiationUtil.getRequestedMediaTypes;
 import static nl.naturalis.purl.rest.ResourceUtil.notAcceptable;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
-import static nl.naturalis.purl.rest.ResourceUtil.plainTextResponse;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
 import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
 
@@ -51,17 +49,16 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
       return notFound("specimen", objectId);
     }
     if (!sourceSystemOK(specimen)) {
-      logger.info("Responding with 404 (Not Found) for unitID \"{}\". Wrong source system: \"{}\"", objectId,
-          specimen.getSourceSystem().getCode());
+      logger.info("Responding with 404 (Not Found) for unitID \"{}\" (wrong source system)", objectId);
       return notFound("specimen", objectId);
     }
     List<MediaType> requested = getRequestedMediaTypes(request);
     if (requested.size() == 0) {
-      return getRdfResponse(specimen);
+      return new RdfResponseProvider(specimen, MEDIATYPE_RDF_XML).createRdfResponse(debug);
     }
     for (MediaType mediaType : requested) {
-      if (mediaType.isCompatible(MEDIATYPE_RDF_XML)) {
-        return getRdfResponse(specimen);
+      if (isRdfMediaType(mediaType)) {
+        return new RdfResponseProvider(specimen, mediaType).createRdfResponse(debug);
       }
       Optional<URI> uri = negotiate(mediaType, specimen);
       if (uri.isPresent()) {
@@ -133,6 +130,8 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
   protected List<MediaType> getAvailableMediaTypes(Specimen specimen) {
     List<MediaType> available = new ArrayList<>();
     available.add(MEDIATYPE_RDF_XML);
+    available.add(MEDIATYPE_RDF_TURTLE);
+    available.add(MEDIATYPE_RDF_JSONLD);
     available.add(MediaType.TEXT_HTML_TYPE);
     available.add(MediaType.APPLICATION_JSON_TYPE);
     available.addAll(getAvailableMultiMediaTypes(specimen));
@@ -160,22 +159,6 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
     } catch (URISyntaxException e) {
       throw new PurlConfigException(e);
     }
-  }
-
-  private Response getRdfResponse(Specimen specimen) {
-    if (debug) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-      new RdfWriter().write(specimen, baos);
-      try {
-        return plainTextResponse(baos.toString("UTF-8"));
-      } catch (UnsupportedEncodingException e) { // Won't happen
-        throw new AssertionError();
-      }
-    }
-    StreamingOutput stream = (output) -> {
-      new RdfWriter().write(specimen, output);
-    };
-    return Response.ok(stream).type(MEDIATYPE_RDF_XML).build();
   }
 
 }

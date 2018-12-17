@@ -38,7 +38,19 @@ public class RdfWriter {
     builder.setNamespace("dwc", DWC_NAMESPACE);
   }
 
-  public void write(Specimen specimen, OutputStream out) {
+  public void writeRdfXml(Specimen specimen, OutputStream out) {
+    write(specimen, out, RDFFormat.RDFXML);
+  }
+
+  public void writeTurtle(Specimen specimen, OutputStream out) {
+    write(specimen, out, RDFFormat.TURTLE);
+  }
+
+  public void writeJsonLd(Specimen specimen, OutputStream out) {
+    write(specimen, out, RDFFormat.JSONLD);
+  }
+
+  public void write(Specimen specimen, OutputStream out, RDFFormat format) {
     IRI iri = vf.createIRI("http://data.biodiversitydata.nl/naturalis/specimen/" + specimen.getUnitID());
     builder.subject(iri);
     addProperty("dc:title", readString(specimen, PATH_SCIENTIFIC_NAME));
@@ -53,7 +65,7 @@ public class RdfWriter {
       builder.add("dwc:associatedMedia", specimen.getAssociatedMultiMediaUris().get(0).getAccessUri().toString());
     }
     Model model = builder.build();
-    Rio.write(model, out, RDFFormat.RDFXML);
+    Rio.write(model, out, format);
   }
 
   private void addProperty(String predicate, String object) {

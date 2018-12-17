@@ -37,7 +37,15 @@ public class ContentNegotiationUtil {
    */
   public static final MediaType MEDIATYPE_RDF_XML = new MediaType("application", "rdf+xml");
   /**
-   * image/jpeg
+   * Defined as {@code text/turtle}.
+   */
+  public static final MediaType MEDIATYPE_RDF_TURTLE = new MediaType("text", "turtle");
+  /**
+   * Defined as {@code application/ld+json}.
+   */
+  public static final MediaType MEDIATYPE_RDF_JSONLD = new MediaType("application", "ld+json");
+  /**
+   * Defined as {@code image/jpeg}.
    */
   private static final MediaType MEDIATYPE_JPEG = new MediaType("image", "jpeg");
 
@@ -143,6 +151,10 @@ public class ContentNegotiationUtil {
       }
     }
     return Optional.empty();
+  }
+
+  public static boolean isRdfMediaType(MediaType mt) {
+    return mt.isCompatible(MEDIATYPE_RDF_XML) || mt.isCompatible(MEDIATYPE_RDF_TURTLE) || mt.isCompatible(MEDIATYPE_RDF_JSONLD);
   }
 
   private static List<MediaType> getRequestedMediaTypesDebug(String requestParam) {
