@@ -64,7 +64,7 @@ public class WaarnemingPurlHandler extends AbstractSpecimenPurlHandler {
   @Override
   protected Optional<URI> findMatchInSpecimenDocument(MediaType mediaType, Specimen specimen) {
     MultiMediaObject[] multimedia = NbaUtil.getMultiMedia(specimen);
-    return ContentNegotiationUtil.findUriForMediaType(mediaType, multimedia);
+    return ContentNegotiationUtil.findMatchingMultiMediaUri(mediaType, multimedia);
   }
 
 }

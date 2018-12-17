@@ -19,8 +19,7 @@ import nl.naturalis.nba.api.model.ServiceAccessPoint;
 import nl.naturalis.nba.api.model.Specimen;
 
 /**
- * A {@code ContentNegotiator} establishes the type of content to be served to the client by comparing Accept headers with the actually
- * available content types for the requested object. N.B. content type is more formally known as media type.
+ * Utility class dealing with matching media types requested via the HTTP Accept header to actually available media types.
  * 
  * @author Ayco Holleman
  *
@@ -32,15 +31,17 @@ public class ContentNegotiationUtil {
    * prefab MediaType.APPLICATION_JSON. We seem to have reports that without the charset parameter, some browsers or browser versions don't
    * interpret the response as expected.
    */
-  public static final MediaType JSON_MEDIA_TYPE = MediaType.valueOf("application/json;charset=UTF-8");
-
+  public static final MediaType MEDIATYPE_JSON = new MediaType("application", "json", "UTF-8");
   /**
    * Defined as {@code application/rdf+xml}.
    */
-  public static MediaType RDF_MEDIA_TYPE = MediaType.valueOf("application/rdf+xml");
+  public static final MediaType MEDIATYPE_RDF_XML = new MediaType("application", "rdf+xml");
+  /**
+   * image/jpeg
+   */
+  private static final MediaType MEDIATYPE_JPEG = new MediaType("image", "jpeg");
 
   private static final Logger logger = LogManager.getLogger(ContentNegotiationUtil.class);
-  private static final String JPEG = "image/jpeg";
 
   /**
    * Retrieve Accept headers from the HTTP request and convert them to an array of {@code MediaType} instances. Note that clients can supply
@@ -66,9 +67,9 @@ public class ContentNegotiationUtil {
           types.add(MediaType.valueOf(one));
         } catch (IllegalArgumentException e) {
           if (mediaTypes.length == 1) {
-            logger.warn("Invalid Accept header in request: \"" + one + "\" (ignored)");
+            logger.warn("Invalid Accept header in request: \"{}\" (ignored)", one);
           } else {
-            logger.warn("Invalid media type in Accept header: \"" + one + "\" (ignored)");
+            logger.warn("Invalid media type in Accept header: \"{}\" (ignored)", one);
           }
         }
       }
@@ -85,8 +86,8 @@ public class ContentNegotiationUtil {
       if (mmo.getServiceAccessPoints() != null) {
         for (ServiceAccessPoint sap : mmo.getServiceAccessPoints()) {
           // HACK. Media type not always set. Solve in import!
-          String format = sap.getFormat() == null ? JPEG : sap.getFormat();
-          mediaTypes.add(MediaType.valueOf(format));
+          MediaType mt = sap.getFormat() == null ? MEDIATYPE_JPEG : MediaType.valueOf(sap.getFormat());
+          mediaTypes.add(mt);
         }
       }
     }
@@ -101,8 +102,8 @@ public class ContentNegotiationUtil {
     if (specimen.getAssociatedMultiMediaUris() != null) {
       for (ServiceAccessPoint sap : specimen.getAssociatedMultiMediaUris()) {
         // HACK. Media type not always set. Solve in import!
-        String format = sap.getFormat() == null ? JPEG : sap.getFormat();
-        mediaTypes.add(MediaType.valueOf(format));
+        MediaType mt = sap.getFormat() == null ? MEDIATYPE_JPEG : MediaType.valueOf(sap.getFormat());
+        mediaTypes.add(mt);
       }
     }
     return mediaTypes;
@@ -111,12 +112,11 @@ public class ContentNegotiationUtil {
   /**
    * Searches the provided multimedia documents for a multimedia URI that matches the provided media type.
    */
-  public static Optional<URI> findUriForMediaType(MediaType requested, MultiMediaObject[] multimedia) {
+  public static Optional<URI> findMatchingMultiMediaUri(MediaType requested, MultiMediaObject[] multimedia) {
     for (MultiMediaObject mmo : multimedia) {
       if (mmo.getServiceAccessPoints() != null) {
         for (ServiceAccessPoint sap : mmo.getServiceAccessPoints()) {
-          String format = sap.getFormat() == null ? JPEG : sap.getFormat();
-          MediaType mt = MediaType.valueOf(format);
+          MediaType mt = sap.getFormat() == null ? MEDIATYPE_JPEG : MediaType.valueOf(sap.getFormat());
           if (requested.isCompatible(mt)) {
             return Optional.ofNullable(sap.getAccessUri());
           }
@@ -133,11 +133,10 @@ public class ContentNegotiationUtil {
    * @param specimen
    * @return
    */
-  public static Optional<URI> findUriForMediaType(MediaType requested, Specimen specimen) {
+  public static Optional<URI> findMatchingMultiMediaUri(MediaType requested, Specimen specimen) {
     if (specimen.getAssociatedMultiMediaUris() != null) {
       for (ServiceAccessPoint sap : specimen.getAssociatedMultiMediaUris()) {
-        String format = sap.getFormat() == null ? JPEG : sap.getFormat();
-        MediaType mt = MediaType.valueOf(format);
+        MediaType mt = sap.getFormat() == null ? MEDIATYPE_JPEG : MediaType.valueOf(sap.getFormat());
         if (requested.isCompatible(mt)) {
           return Optional.ofNullable(sap.getAccessUri());
         }
@@ -153,7 +152,7 @@ public class ContentNegotiationUtil {
       try {
         types.add(MediaType.valueOf(chunk));
       } catch (IllegalArgumentException e) {
-        logger.warn("Invalid media type in __accept parameter: \"" + chunk + "\" (ignored)");
+        logger.warn("Invalid media type in __accept parameter: \"{}\" (ignored)", chunk);
       }
     }
     return types;

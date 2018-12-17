@@ -7,22 +7,25 @@
 # "nl.naturalis.purl.conf.dir". With Wildfly
 # system properties are best set in standalone.xml
 
-# PROD
+# Base URL under which this app runs. It may not
+# really know this because of load balancers
+# confusing wildfly. Leave empty on PROD or set to
+# http://data.biodiversitydata.nl. This setting is
+# only relevant for the welcome page.
+#purl.baseurl=http://data.biodiversitydata.nl
+purl.baseurl=http://localhost:8080/purl/
+
+# NBA PROD
 #nba.baseurl=http://api.biodiversitydata.nl/v2
-# DEV
+# NBA TEST
+# nba.baseurl=http://145.136.242.164:8080/v2/
+# NBA DEV
 nba.baseurl=http://145.136.242.164:8080/v2/
 
-# Template for the Bioportal's specimen detail page.
-# Use ${unitID} as a placeholder for the actual unitID.
+# HTML detail pages. Use ${unitID} as a placeholder
+# for the actual unitID. Use ${sourceSystemId} as a
+# placeholder for the source system's original ID.
 bioportal.specimen.url=http://bioportal.naturalis.nl/specimen/${unitID}
+xenocanto.observation.url=https://www.xeno-canto.org/${unitID}
+waarneming.observation.url=https://waarneming.nl/waarneming/view/${sourceSystemId}
 
-# Template for the Xeno-canto's specimen detail page.
-# Use ${sourceSystemId} as a placeholder for the actual
-# source system ID.
-xenocanto.observation.url=https://www.xeno-canto.org/${sourceSystemId}
-
-# If true no redirect to a new URL (e.g. a Bioportal
-# URL) will take place. Instead, the contents of that
-# URL will be retrieved and displayed "under" the
-# PURL.
-noredirect=false

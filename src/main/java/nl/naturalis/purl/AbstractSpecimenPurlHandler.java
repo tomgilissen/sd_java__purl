@@ -1,5 +1,7 @@
 package nl.naturalis.purl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
@@ -18,12 +21,14 @@ import org.apache.logging.log4j.Logger;
 
 import nl.naturalis.nba.api.model.Specimen;
 import nl.naturalis.nba.utils.StringUtil;
+import nl.naturalis.purl.rdf.RdfWriter;
 
+import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_XML;
 import static nl.naturalis.purl.ContentNegotiationUtil.getAvailableMultiMediaTypes;
 import static nl.naturalis.purl.ContentNegotiationUtil.getRequestedMediaTypes;
-import static nl.naturalis.purl.rest.ResourceUtil.load;
 import static nl.naturalis.purl.rest.ResourceUtil.notAcceptable;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
+import static nl.naturalis.purl.rest.ResourceUtil.plainTextResponse;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
 import static nl.naturalis.purl.rest.ResourceUtil.redirectDebug;
 
@@ -51,12 +56,15 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
       return notFound("specimen", objectId);
     }
     List<MediaType> requested = getRequestedMediaTypes(request);
+    if (requested.size() == 0) {
+      return getRdfResponse(specimen);
+    }
     for (MediaType mediaType : requested) {
+      if (mediaType.isCompatible(MEDIATYPE_RDF_XML)) {
+        return getRdfResponse(specimen);
+      }
       Optional<URI> uri = negotiate(mediaType, specimen);
       if (uri.isPresent()) {
-        if (Registry.getInstance().getConfig().isTrue("noredirect")) {
-          return load(uri.get(), mediaType);
-        }
         if (debug) {
           return redirectDebug(uri.get());
         }
@@ -70,7 +78,9 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
   }
 
   /**
-   * Test whether provided specimen belongs to the right source system.
+   * Test whether the PURL being handled is compatible with the specimen retrieved using the unitID element in the PURL. For example,
+   * http://data.biodiversitydata.nl/naturalis/specimen/XC12345 is a Naturalis PURL containing a Xeno-canto unitID. This needs to be
+   * rejected (i.e. result in a 404 response).
    * 
    * @param specimen
    * @return
@@ -91,9 +101,6 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
     if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
       return Optional.of(getNbaUri());
     }
-//    if(mediaType.isCompatible()) {
-//      
-//    }
     return findMatchInSpecimenDocument(mediaType, specimen);
   }
 
@@ -113,18 +120,19 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
    * @return
    */
   protected Optional<URI> findMatchInSpecimenDocument(MediaType mediaType, Specimen specimen) {
-    return ContentNegotiationUtil.findUriForMediaType(mediaType, specimen);
+    return ContentNegotiationUtil.findMatchingMultiMediaUri(mediaType, specimen);
   }
 
   /**
-   * Provide a list of media types that can be served. By default a list of HTML, JSON and all multimedia media types found in the specimen
-   * document is returned, but subclasses can override this if required.
+   * Provide a list of media types that can be served. By default a list of RDF/XML, HTML, JSON and all multimedia media types found in the
+   * specimen document is returned, but subclasses can override this if required.
    * 
    * @param specimen
    * @return
    */
   protected List<MediaType> getAvailableMediaTypes(Specimen specimen) {
     List<MediaType> available = new ArrayList<>();
+    available.add(MEDIATYPE_RDF_XML);
     available.add(MediaType.TEXT_HTML_TYPE);
     available.add(MediaType.APPLICATION_JSON_TYPE);
     available.addAll(getAvailableMultiMediaTypes(specimen));
@@ -152,6 +160,22 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
     } catch (URISyntaxException e) {
       throw new PurlConfigException(e);
     }
+  }
+
+  private Response getRdfResponse(Specimen specimen) {
+    if (debug) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+      new RdfWriter().write(specimen, baos);
+      try {
+        return plainTextResponse(baos.toString("UTF-8"));
+      } catch (UnsupportedEncodingException e) { // Won't happen
+        throw new AssertionError();
+      }
+    }
+    StreamingOutput stream = (output) -> {
+      new RdfWriter().write(specimen, output);
+    };
+    return Response.ok(stream).type(MEDIATYPE_RDF_XML).build();
   }
 
 }

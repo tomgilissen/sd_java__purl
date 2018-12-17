@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -13,7 +14,6 @@ import javax.ws.rs.core.Variant;
 
 import nl.naturalis.nba.utils.debug.BeanPrinter;
 import nl.naturalis.nba.utils.http.SimpleHttpGet;
-import nl.naturalis.purl.Messages;
 
 import static nl.naturalis.purl.Messages.INTERNAL_SERVER_ERROR;
 import static nl.naturalis.purl.Messages.NOT_ACCEPTABLE;
@@ -35,12 +35,11 @@ public class ResourceUtil {
    * @param raw The {@code String} to encode
    * @return
    */
-  public static String utf8Encode(String raw) {
+  public static String urlEncode(String raw) {
     try {
       return URLEncoder.encode(raw, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      // Won't happen with UTF-8
-      return null;
+    } catch (UnsupportedEncodingException e) { // Won't happen
+      throw new AssertionError();
     }
   }
 
@@ -137,25 +136,6 @@ public class ResourceUtil {
   }
 
   /**
-   * Generate a debug variant of an HTTP 406 (NOT ACCEPTABLE) response. The HTTP status actually returned is 200 (OK) and the list of
-   * alternative mediatypes is written to the response body.
-   * 
-   * @param variants
-   * @return
-   */
-  public static Response notAcceptableDebug(List<Variant> variants) {
-    StringBuilder sb = new StringBuilder(200);
-    sb.append(Messages.NOT_ACCEPTABLE);
-    sb.append("\nAcceptable media types for this object: ");
-    if (variants == null || variants.size() == 0) {
-      sb.append(" none!");
-    } else {
-      sb.append(getVariantsAsString(variants));
-    }
-    return plainTextResponse(sb.toString());
-  }
-
-  /**
    * Generate a 200 (OK) response with the specified message in the response body and a Content-Type header of text/plain.
    * 
    * @param message
@@ -191,14 +171,7 @@ public class ResourceUtil {
   }
 
   private static String getVariantsAsString(List<Variant> variants) {
-    StringBuilder sb = new StringBuilder(64);
-    for (int i = 0; i < variants.size(); ++i) {
-      if (i != 0) {
-        sb.append(',');
-      }
-      sb.append(variants.get(i).getMediaType().toString());
-    }
-    return sb.toString();
+    return variants.stream().map(v -> v.getMediaType().toString()).collect(Collectors.joining(","));
   }
 
 }
