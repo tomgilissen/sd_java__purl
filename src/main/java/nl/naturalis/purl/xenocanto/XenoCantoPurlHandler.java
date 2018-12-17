@@ -15,13 +15,12 @@ import nl.naturalis.nba.utils.ConfigObject;
 import nl.naturalis.purl.AbstractSpecimenPurlHandler;
 import nl.naturalis.purl.PurlConfigException;
 import nl.naturalis.purl.Registry;
-import nl.naturalis.purl.rest.PurlHandler;
 
 import static nl.naturalis.nba.api.model.SourceSystem.XC;
 import static nl.naturalis.purl.Messages.MISSING_PLACEHOLDER;
 
 /**
- * A {@link PurlHandler} capable of handling PURLs for specimen objects.
+ * Handles PURLs conforming to the Xeno Canto URL template.
  * 
  * @author Ayco Holleman
  */

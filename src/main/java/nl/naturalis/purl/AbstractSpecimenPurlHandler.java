@@ -91,6 +91,9 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
     if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
       return Optional.of(getNbaUri());
     }
+//    if(mediaType.isCompatible()) {
+//      
+//    }
     return findMatchInSpecimenDocument(mediaType, specimen);
   }
 
