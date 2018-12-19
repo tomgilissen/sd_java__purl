@@ -59,7 +59,7 @@ public class WaarnemingPurlHandler extends AbstractSpecimenPurlHandler {
 
   /*
    * NOTE: waarneming.nl has blanked out the multimedia URIs in the specimen document, so the implementation in AbstractSpecimenPurlHandler
-   * won't work. But the URIs can still be found in the MultiMediaObject index.
+   * won't work. The multimedia URIs can still be found in the MultiMediaObject index.
    */
   @Override
   protected Optional<URI> findMatchInSpecimenDocument(MediaType mediaType, Specimen specimen) {

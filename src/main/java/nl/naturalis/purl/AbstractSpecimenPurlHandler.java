@@ -22,9 +22,10 @@ import nl.naturalis.purl.rdf.RdfResponseProvider;
 
 import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_JSONLD;
 import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_TURTLE;
-import static nl.naturalis.purl.ContentNegotiationUtil.*;
+import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_XML;
 import static nl.naturalis.purl.ContentNegotiationUtil.getAvailableMultiMediaTypes;
 import static nl.naturalis.purl.ContentNegotiationUtil.getRequestedMediaTypes;
+import static nl.naturalis.purl.ContentNegotiationUtil.isRdfMediaType;
 import static nl.naturalis.purl.rest.ResourceUtil.notAcceptable;
 import static nl.naturalis.purl.rest.ResourceUtil.notFound;
 import static nl.naturalis.purl.rest.ResourceUtil.redirect;
@@ -45,20 +46,19 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
   protected Response doHandle() throws PurlException {
     Specimen specimen = NbaUtil.getSpecimen(objectId);
     if (specimen == null) {
-      logger.info("Responding with 404 (Not Found) for unitID \"{}\"", objectId);
       return notFound("specimen", objectId);
     }
     if (!sourceSystemOK(specimen)) {
-      logger.info("Responding with 404 (Not Found) for unitID \"{}\" (wrong source system)", objectId);
+      logger.info("Mismatch between UnitID and institution in PURL");
       return notFound("specimen", objectId);
     }
     List<MediaType> requested = getRequestedMediaTypes(request);
     if (requested.size() == 0) {
-      return new RdfResponseProvider(specimen, MEDIATYPE_RDF_XML).createRdfResponse(debug);
+      return new RdfResponseProvider(specimen, MEDIATYPE_RDF_XML).createRdfResponse();
     }
     for (MediaType mediaType : requested) {
       if (isRdfMediaType(mediaType)) {
-        return new RdfResponseProvider(specimen, mediaType).createRdfResponse(debug);
+        return new RdfResponseProvider(specimen, mediaType).createRdfResponse();
       }
       Optional<URI> uri = negotiate(mediaType, specimen);
       if (uri.isPresent()) {
@@ -70,14 +70,13 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
     }
     List<MediaType> available = getAvailableMediaTypes(specimen);
     List<Variant> variants = Variant.mediaTypes(available.toArray(new MediaType[available.size()])).build();
-    logger.info("Responding with 406 (Not Acceptable) for unitID \"{}\"", objectId);
     return notAcceptable(variants);
   }
 
   /**
    * Test whether the PURL being handled is compatible with the specimen retrieved using the unitID element in the PURL. For example,
-   * http://data.biodiversitydata.nl/naturalis/specimen/XC12345 is a Naturalis PURL containing a Xeno-canto unitID. This needs to be
-   * rejected (i.e. result in a 404 response).
+   * http://data.biodiversitydata.nl/naturalis/specimen/XC12345 is a Naturalis PURL containing a Xeno-canto unitID. This must result in a
+   * 404 response.
    * 
    * @param specimen
    * @return
@@ -110,7 +109,7 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
   protected abstract Optional<URI> getHtmlLandingPage(Specimen specimen);
 
   /**
-   * Search the provided specimen document for a URI matching the requested media type.
+   * Search the provided specimen document for a multimedia URI matching the requested media type.
    * 
    * @param mediaType
    * @param specimen
@@ -130,11 +129,11 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
   protected List<MediaType> getAvailableMediaTypes(Specimen specimen) {
     List<MediaType> available = new ArrayList<>();
     available.add(MEDIATYPE_RDF_XML);
+    available.add(MediaType.TEXT_HTML_TYPE);
+    available.addAll(getAvailableMultiMediaTypes(specimen));
+    available.add(MediaType.APPLICATION_JSON_TYPE);
     available.add(MEDIATYPE_RDF_TURTLE);
     available.add(MEDIATYPE_RDF_JSONLD);
-    available.add(MediaType.TEXT_HTML_TYPE);
-    available.add(MediaType.APPLICATION_JSON_TYPE);
-    available.addAll(getAvailableMultiMediaTypes(specimen));
     return available;
   }
 

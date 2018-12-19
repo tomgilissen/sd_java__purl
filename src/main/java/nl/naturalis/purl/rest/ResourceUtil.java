@@ -91,18 +91,6 @@ public class ResourceUtil {
   }
 
   /**
-   * Report a server error, but set the actual HTTP status to 200 (OK). By setting the HTTP status to 200, we are guaranteed that the
-   * browser treats and displays the response body in the most typical fashion. The content type of the response body is set to text/plain.
-   * 
-   * @param message
-   * @return
-   */
-  public static Response serverErrorDebug(String message) {
-    message = INTERNAL_SERVER_ERROR + message;
-    return plainTextResponse(message);
-  }
-
-  /**
    * Generate a 404 (NOT FOUND) response with the specified message in the response body.
    * 
    * @param message

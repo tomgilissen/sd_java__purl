@@ -12,8 +12,6 @@ import nl.naturalis.nba.utils.StringUtil;
 import nl.naturalis.purl.rest.PurlHandler;
 import nl.naturalis.purl.rest.ResourceUtil;
 
-import static nl.naturalis.purl.rest.ResourceUtil.serverErrorDebug;
-
 /**
  * Abstract base class for classes capable of handling PURL requests. Implements the one method specified by the {@link PurlHandler}
  * interface by delegating everything except exception handling to concrete subclasses via the abstract template method (
@@ -36,7 +34,7 @@ public abstract class AbstractPurlHandler implements PurlHandler {
    */
   protected final String objectId;
   /**
-   * Whether or not we should provide debug information, wrapped in a {@link ResourceUtil#serverErrorDebug(String) debug response}.
+   * If the __debug query parameter is provided we do not actually redirect, but only show the location to which we would redirect.
    */
   protected final boolean debug;
 
@@ -68,16 +66,11 @@ public abstract class AbstractPurlHandler implements PurlHandler {
   public final Response handlePurl() {
     try {
       Response response = doHandle();
+      logger.info("{} ({})", response.getStatusInfo().toString(), uriInfo.getPath());
       return response;
     } catch (ServerException e) {
-      if (debug) {
-        return serverErrorDebug(e.getServerInfoAsString());
-      }
       return ResourceUtil.serverError(e.getServerInfoAsString());
     } catch (Throwable t) {
-      if (debug) {
-        return serverErrorDebug(getStackTrace(t));
-      }
       return ResourceUtil.serverError(getStackTrace(t));
     }
   }

@@ -1,8 +1,5 @@
 package nl.naturalis.purl.rdf;
 
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -12,7 +9,6 @@ import nl.naturalis.nba.api.model.Specimen;
 import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_JSONLD;
 import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_TURTLE;
 import static nl.naturalis.purl.ContentNegotiationUtil.MEDIATYPE_RDF_XML;
-import static nl.naturalis.purl.rest.ResourceUtil.plainTextResponse;
 
 public class RdfResponseProvider {
 
@@ -24,9 +20,9 @@ public class RdfResponseProvider {
     this.mediaType = mediaType;
   }
 
-  public Response createRdfResponse(boolean debug) {
+  public Response createRdfResponse() {
     if (mediaType.isCompatible(MEDIATYPE_RDF_XML)) {
-      return createRdfXmlResponse(debug);
+      return createRdfXmlResponse();
     }
     if (mediaType.isCompatible(MEDIATYPE_RDF_TURTLE)) {
       return createTurtleResponse();
@@ -37,16 +33,7 @@ public class RdfResponseProvider {
     throw new AssertionError("Unexpected RDF format");
   }
 
-  private Response createRdfXmlResponse(boolean debug) {
-    if (debug) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-      new RdfWriter().writeRdfXml(specimen, baos);
-      try {
-        return plainTextResponse(baos.toString("UTF-8"));
-      } catch (UnsupportedEncodingException e) { // Won't happen
-        throw new AssertionError();
-      }
-    }
+  private Response createRdfXmlResponse() {
     StreamingOutput stream = (output) -> {
       new RdfWriter().writeRdfXml(specimen, output);
     };

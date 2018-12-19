@@ -42,11 +42,11 @@ public class XenoCantoPurlHandler extends AbstractSpecimenPurlHandler {
   protected Optional<URI> getHtmlLandingPage(Specimen specimen) {
     ConfigObject cfg = Registry.getInstance().getConfig();
     String uriTemplate = cfg.required("xenocanto.observation.url");
-    if (!uriTemplate.contains("${unitID}")) {
-      throw new PurlConfigException(String.format(MISSING_PLACEHOLDER, "unitID", uriTemplate));
+    if (!uriTemplate.contains("${sourceSystemId}")) {
+      throw new PurlConfigException(String.format(MISSING_PLACEHOLDER, "sourceSystemId", uriTemplate));
     }
     try {
-      URI uri = new URI(uriTemplate.replace("${unitID}", specimen.getUnitID()));
+      URI uri = new URI(uriTemplate.replace("${sourceSystemId}", specimen.getSourceSystemId()));
       return Optional.of(uri);
     } catch (URISyntaxException e) {
       throw new PurlConfigException(e);
