@@ -1,7 +1,6 @@
 package nl.naturalis.purl.waarneming;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +16,10 @@ import nl.naturalis.nba.utils.ConfigObject;
 import nl.naturalis.purl.AbstractSpecimenPurlHandler;
 import nl.naturalis.purl.ContentNegotiationUtil;
 import nl.naturalis.purl.NbaUtil;
-import nl.naturalis.purl.PurlConfigException;
+import nl.naturalis.purl.PurlUtil;
 import nl.naturalis.purl.Registry;
 
 import static nl.naturalis.nba.api.model.SourceSystem.OBS;
-import static nl.naturalis.purl.Messages.MISSING_PLACEHOLDER;
 
 /**
  * Handles PURLs conforming to the Waarneming.nl URL template.
@@ -45,24 +43,16 @@ public class WaarnemingPurlHandler extends AbstractSpecimenPurlHandler {
   @Override
   protected Optional<URI> getHtmlLandingPage(Specimen specimen) {
     ConfigObject cfg = Registry.getInstance().getConfig();
-    String uriTemplate = cfg.required("waarneming.observation.url");
-    if (!uriTemplate.contains("${sourceSystemId}")) {
-      throw new PurlConfigException(String.format(MISSING_PLACEHOLDER, "sourceSystemId", uriTemplate));
-    }
-    try {
-      URI uri = new URI(uriTemplate.replace("${sourceSystemId}", specimen.getSourceSystemId()));
-      return Optional.of(uri);
-    } catch (URISyntaxException e) {
-      throw new PurlConfigException(e);
-    }
+    String urlTemplate = cfg.required("waarneming.observation.url");
+    return Optional.of(PurlUtil.createUrl(urlTemplate, "sourceSystemId", specimen.getSourceSystemId()));
   }
 
   /*
    * NOTE: waarneming.nl has blanked out the multimedia URIs in the specimen document, so the implementation in AbstractSpecimenPurlHandler
-   * won't work. The multimedia URIs can still be found in the MultiMediaObject index.
+   * won't work. The multimedia URIs can still be found in the MultiMediaObject index though.
    */
   @Override
-  protected Optional<URI> findMatchInSpecimenDocument(MediaType mediaType, Specimen specimen) {
+  protected Optional<URI> findMultiMediaUriWithMediaType(MediaType mediaType, Specimen specimen) {
     MultiMediaObject[] multimedia = NbaUtil.getMultiMedia(specimen);
     return ContentNegotiationUtil.findMatchingMultiMediaUri(mediaType, multimedia);
   }

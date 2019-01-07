@@ -1,7 +1,6 @@
 package nl.naturalis.purl.xenocanto;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,11 +12,10 @@ import org.apache.logging.log4j.Logger;
 import nl.naturalis.nba.api.model.Specimen;
 import nl.naturalis.nba.utils.ConfigObject;
 import nl.naturalis.purl.AbstractSpecimenPurlHandler;
-import nl.naturalis.purl.PurlConfigException;
+import nl.naturalis.purl.PurlUtil;
 import nl.naturalis.purl.Registry;
 
 import static nl.naturalis.nba.api.model.SourceSystem.XC;
-import static nl.naturalis.purl.Messages.MISSING_PLACEHOLDER;
 
 /**
  * Handles PURLs conforming to the Xeno Canto URL template.
@@ -41,16 +39,8 @@ public class XenoCantoPurlHandler extends AbstractSpecimenPurlHandler {
   @Override
   protected Optional<URI> getHtmlLandingPage(Specimen specimen) {
     ConfigObject cfg = Registry.getInstance().getConfig();
-    String uriTemplate = cfg.required("xenocanto.observation.url");
-    if (!uriTemplate.contains("${sourceSystemId}")) {
-      throw new PurlConfigException(String.format(MISSING_PLACEHOLDER, "sourceSystemId", uriTemplate));
-    }
-    try {
-      URI uri = new URI(uriTemplate.replace("${sourceSystemId}", specimen.getSourceSystemId()));
-      return Optional.of(uri);
-    } catch (URISyntaxException e) {
-      throw new PurlConfigException(e);
-    }
+    String urlTemplate = cfg.required("xenocanto.observation.url");
+    return Optional.of(PurlUtil.createUrl(urlTemplate, "sourceSystemId", specimen.getSourceSystemId()));
   }
 
 }

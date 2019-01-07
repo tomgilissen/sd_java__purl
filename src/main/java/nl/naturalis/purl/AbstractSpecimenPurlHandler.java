@@ -60,7 +60,7 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
       if (isRdfMediaType(mediaType)) {
         return new RdfResponseProvider(specimen, mediaType).createRdfResponse();
       }
-      Optional<URI> uri = negotiate(mediaType, specimen);
+      Optional<URI> uri = findUriWithMediaType(mediaType, specimen);
       if (uri.isPresent()) {
         if (debug) {
           return redirectDebug(uri.get());
@@ -90,14 +90,14 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
    * @param specimen
    * @return
    */
-  protected Optional<URI> negotiate(MediaType mediaType, Specimen specimen) {
+  protected Optional<URI> findUriWithMediaType(MediaType mediaType, Specimen specimen) {
     if (mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
       return getHtmlLandingPage(specimen);
     }
     if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
       return Optional.of(getNbaUri());
     }
-    return findMatchInSpecimenDocument(mediaType, specimen);
+    return findMultiMediaUriWithMediaType(mediaType, specimen);
   }
 
   /**
@@ -115,7 +115,7 @@ public abstract class AbstractSpecimenPurlHandler extends AbstractPurlHandler {
    * @param specimen
    * @return
    */
-  protected Optional<URI> findMatchInSpecimenDocument(MediaType mediaType, Specimen specimen) {
+  protected Optional<URI> findMultiMediaUriWithMediaType(MediaType mediaType, Specimen specimen) {
     return ContentNegotiationUtil.findMatchingMultiMediaUri(mediaType, specimen);
   }
 
