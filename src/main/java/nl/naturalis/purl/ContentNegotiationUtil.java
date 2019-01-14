@@ -2,6 +2,7 @@ package nl.naturalis.purl;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -61,24 +62,19 @@ public class ContentNegotiationUtil {
    * @return
    */
   public static List<MediaType> getRequestedMediaTypes(HttpServletRequest request) {
-    String acceptParam = request.getParameter("__accept");
-    if (acceptParam != null) {
-      return getRequestedMediaTypesDebug(acceptParam);
+    if (request.getParameter("__accept") != null) {
+      return getRequestedMediaTypesDebug(request);
     }
     List<MediaType> types = new ArrayList<>();
     Enumeration<String> acceptHeaders = request.getHeaders("Accept");
     while (acceptHeaders.hasMoreElements()) {
       String acceptHeader = acceptHeaders.nextElement();
       String[] mediaTypes = acceptHeader.split(",");
-      for (String one : mediaTypes) {
+      for (String s : mediaTypes) {
         try {
-          types.add(MediaType.valueOf(one));
+          types.add(MediaType.valueOf(s.trim()));
         } catch (IllegalArgumentException e) {
-          if (mediaTypes.length == 1) {
-            logger.warn("Invalid Accept header in request: \"{}\" (ignored)", one);
-          } else {
-            logger.warn("Invalid media type in Accept header: \"{}\" (ignored)", one);
-          }
+          logger.warn("Invalid media type: \"{}\" (ignored)", s);
         }
       }
     }
@@ -157,17 +153,18 @@ public class ContentNegotiationUtil {
     return mt.isCompatible(MEDIATYPE_RDF_XML) || mt.isCompatible(MEDIATYPE_RDF_TURTLE) || mt.isCompatible(MEDIATYPE_RDF_JSONLD);
   }
 
-  private static List<MediaType> getRequestedMediaTypesDebug(String requestParam) {
-    String[] chunks = requestParam.split(",");
-    List<MediaType> types = new ArrayList<>(chunks.length);
-    for (String chunk : chunks) {
-      try {
-        types.add(MediaType.valueOf(chunk));
-      } catch (IllegalArgumentException e) {
-        logger.warn("Invalid media type in __accept parameter: \"{}\" (ignored)", chunk);
-      }
-    }
-    return types;
+  private static List<MediaType> getRequestedMediaTypesDebug(HttpServletRequest request) {
+    List<MediaType> requested = new ArrayList<>(4);
+    Arrays.stream(request.getParameterValues("__accept")).forEach(accept -> {
+      Arrays.stream(accept.split(",")).forEach(s -> {
+        try {
+          requested.add(MediaType.valueOf(s.trim()));
+        } catch (IllegalArgumentException e) {
+          logger.warn("Invalid media type: \"{}\" (ignored)", s);
+        }
+      });
+    });
+    return requested;
   }
 
 }
