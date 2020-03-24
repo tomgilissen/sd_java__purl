@@ -12,7 +12,7 @@
 		<!-- Library dependencies -->
 		<!-- *** Check for updates: mvn versions:display-dependency-updates -->
 		<!-- *** Check dependencies: mvn dependency:analyze -->
-		<nba.version>2.18</nba.version>
+		<nba.version>2.21</nba.version>
 		<jackson.version>2.9.7</jackson.version>
 		<rdf4j.version>2.4.2</rdf4j.version>
 		<junit.version>4.12</junit.version>
