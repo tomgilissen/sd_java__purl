@@ -3,29 +3,71 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Naturalis PURL Server</title>
+		<style type="text/css">
+			h1, p {
+				font-family: "Arial";
+			}
+			table {
+				background-color: #000;
+			}		
+			td {
+				color: #0ff;
+				font-family: "Mono";
+				font-size: 12px;
+				border: 1px solid #000;
+				padding: 2px;
+			}
+			td:first-child {
+				text-align: right;
+				padding: 2px 6px 2px 2px;
+			}
+		</style>
 	</head>
 	<body>
 		<h1>PURL server up and running!</h1>
 		<p>
-		Welcome to the biodiversitydata.nl PURL server. We are in the process of creating
-		persistent URLs (PURLs) for our main assets. For more information, see
-		<a href="http://docs.biodiversitydata.nl">our documentation</a>.
+			<table>
+				<tr>
+					<td>Version:</td>
+					<td>${version}</td>
+				</tr>
+				<tr>
+					<td>Build date:</td>
+					<td>${buildDate}</td>
+				</tr>
+				<tr>
+					<td>Build number:</td>
+					<td>${commitCount}</td>
+				</tr>
+				<tr>
+					<td>Git branch:</td>
+					<td>${gitBranch}</td>
+				</tr>
+				<tr>
+					<td>Git commit ID:</td>
+					<td>${gitCommit}</td>
+				</tr>
+			</table>
+		</p>
+		<p>
+		Welcome to the biodiversitydata.nl PURL server. The PURL server provides persistent URLs for
+		specimens from Naturalis, Xeno-Canto and Waarneming.nl.
 		</p>
 		<p>PURLs take the following form:</p>
 		<h3>Naturalis:</h3>
-		<pre>@baseurl@/naturalis/specimen/{ObjectID}</pre>
+		<pre>${baseUrl}/naturalis/specimen/{ObjectID}</pre>
 		<p>Substitute {ObjectID} with an actual specimen ID. For example:
-		<a href="@baseurl@/naturalis/specimen/U.1040749">@baseurl@/naturalis/specimen/U.1040749</a>
+		<a href="${baseUrl}/naturalis/specimen/U.1040749">${baseUrl}/naturalis/specimen/U.1040749</a>
 		</p>
 		<h3>Xeno-canto:</h3>
-		<pre>@baseurl@/xeno-canto/observation/{ObjectID}</pre>
+		<pre>${baseUrl}/xeno-canto/observation/{ObjectID}</pre>
 		<p>Substitute {ObjectID} with an actual observation ID from xeno-canto.org. For example:
-		<a href="@baseurl@/xeno-canto/observation/XC401237">@baseurl@/xeno-canto/observation/XC401237</a>
+		<a href="${baseUrl}/xeno-canto/observation/XC401237">${baseUrl}/xeno-canto/observation/XC401237</a>
 		</p>
 		<h3>Waarneming.nl:</h3>
-		<pre>@baseurl@/obsint/observation/{ObjectID}</pre>
+		<pre>${baseUrl}/obsint/observation/{ObjectID}</pre>
 		<p>Substitute {ObjectID} with an actual observation ID from waarneming.nl. For example:
-		<a href="@baseurl@/obsint/observation/OBS.79206189">@baseurl@/obsint/observation/OBS.79206189</a>
+		<a href="${baseUrl}/obsint/observation/OBS.79206189">${baseUrl}/obsint/observation/OBS.79206189</a>
 		</p>
 	</body>
 </html>
