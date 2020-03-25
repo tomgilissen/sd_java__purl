@@ -29,23 +29,23 @@
 			<table>
 				<tr>
 					<td>Version:</td>
-					<td>${version}</td>
+					<td>@version@</td>
 				</tr>
 				<tr>
 					<td>Build date:</td>
-					<td>${buildDate}</td>
+					<td>@buildDate@</td>
 				</tr>
 				<tr>
 					<td>Build number:</td>
-					<td>${commitCount}</td>
+					<td>@commitCount@</td>
 				</tr>
 				<tr>
 					<td>Git branch:</td>
-					<td>${gitBranch}</td>
+					<td>@gitBranch@</td>
 				</tr>
 				<tr>
 					<td>Git commit ID:</td>
-					<td>${gitCommit}</td>
+					<td>@gitCommit@</td>
 				</tr>
 			</table>
 		</p>
@@ -55,19 +55,19 @@
 		</p>
 		<p>PURLs take the following form:</p>
 		<h3>Naturalis:</h3>
-		<pre>${baseUrl}/naturalis/specimen/{ObjectID}</pre>
+		<pre>@baseUrl@/naturalis/specimen/{ObjectID}</pre>
 		<p>Substitute {ObjectID} with an actual specimen ID. For example:
-		<a href="${baseUrl}/naturalis/specimen/U.1040749">${baseUrl}/naturalis/specimen/U.1040749</a>
+		<a href="@baseUrl@/naturalis/specimen/U.1040749">@baseUrl@/naturalis/specimen/U.1040749</a>
 		</p>
 		<h3>Xeno-canto:</h3>
-		<pre>${baseUrl}/xeno-canto/observation/{ObjectID}</pre>
+		<pre>@baseUrl@/xeno-canto/observation/{ObjectID}</pre>
 		<p>Substitute {ObjectID} with an actual observation ID from xeno-canto.org. For example:
-		<a href="${baseUrl}/xeno-canto/observation/XC401237">${baseUrl}/xeno-canto/observation/XC401237</a>
+		<a href="@baseUrl@/xeno-canto/observation/XC401237">@baseUrl@/xeno-canto/observation/XC401237</a>
 		</p>
 		<h3>Waarneming.nl:</h3>
-		<pre>${baseUrl}/obsint/observation/{ObjectID}</pre>
+		<pre>@baseUrl@/obsint/observation/{ObjectID}</pre>
 		<p>Substitute {ObjectID} with an actual observation ID from waarneming.nl. For example:
-		<a href="${baseUrl}/obsint/observation/OBS.79206189">${baseUrl}/obsint/observation/OBS.79206189</a>
+		<a href="@baseUrl@/obsint/observation/OBS.79206189">@baseUrl@/obsint/observation/OBS.79206189</a>
 		</p>
 	</body>
 </html>

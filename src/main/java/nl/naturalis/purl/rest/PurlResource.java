@@ -52,12 +52,12 @@ public class PurlResource {
     } else {
       baseUrl = StringUtil.rtrim(baseUrl, '/');
     }
-    html = html.replaceAll("${baseUrl}", baseUrl);
-    html = StringUtils.replaceOnce(html, "${version}", BuildInfo.getInstance().getVersion());
-    html = StringUtils.replaceOnce(html, "${buildDate}", BuildInfo.getInstance().getBuildDate());
-    html = StringUtils.replaceOnce(html, "${commitCount}", BuildInfo.getInstance().getCommitCount());
-    html = StringUtils.replaceOnce(html, "${gitBranch}", BuildInfo.getInstance().getGitBranch());
-    html = StringUtils.replaceOnce(html, "${gitCommit}", BuildInfo.getInstance().getGitCommit());
+    html = StringUtils.replace(html, "@baseUrl@", baseUrl);
+    html = StringUtils.replaceOnce(html, "@version@", BuildInfo.getInstance().getVersion());
+    html = StringUtils.replaceOnce(html, "@buildDate@", BuildInfo.getInstance().getBuildDate());
+    html = StringUtils.replaceOnce(html, "@commitCount@", BuildInfo.getInstance().getCommitCount());
+    html = StringUtils.replaceOnce(html, "@gitBranch@", BuildInfo.getInstance().getGitBranch());
+    html = StringUtils.replaceOnce(html, "@gitCommit@", BuildInfo.getInstance().getGitCommit());
     return html;
   }
 
